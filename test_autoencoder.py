@@ -5,6 +5,8 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import transform
+from voxel import voxel2obj
+from mpl_toolkits.mplot3d import Axes3D
 from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 10  # Number of samples in each batch
@@ -18,7 +20,7 @@ def resize_batch(imgs):
     #   imgs: a numpy array of size [batch_size, 28 X 28].
     # Returns:
     #   a numpy array of size [batch_size, 32, 32].
-    #imgs = imgs.reshape((-1, 28, 28, 28, 1))
+    imgs = imgs.reshape((-1, 32, 32, 32, 1))
 
     resized_imgs = np.zeros((imgs.shape[0], 32, 32, 32, 1))
     for i in range(imgs.shape[0]):
@@ -30,8 +32,13 @@ def resize_batch(imgs):
 def loadfile():
     input_file = np.array([])
     for i in range(21, 71):
-        v = np.loadtxt('/home/gigl/Downloads/Volume of shapes/MyTestFile' + str(i) + '.txt')
+        v = np.loadtxt('/home/gigl/Research/simple_autoencoder/Volume of shapes/MyTestFile' + str(i) + '.txt')
         image_matrix = np.reshape(v, (32, 32, 32)).astype(np.float32)
+        z, x, y = image_matrix.nonzero()
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(x, y, -z, zdir='z', c='red')
+        plt.savefig('input_data/demo' + str(i) + '.png')
         input_file = np.append(input_file, image_matrix)
 
     input_file = np.reshape(input_file, (50, 32 * 32 * 32))
@@ -68,13 +75,7 @@ def next_batch(next_batch_array, batchsize, offset):
     rowStart = offset * batchsize
     rowEnd = (rowStart + batchsize) - 1
     return next_batch_array[rowStart:rowEnd, :]
-    '''row,col = next_batch_array.shape # row should be 50 as our input file dim is [50,32768]
-    if (next_batch_array != null):
-        nextbatch = np.array([])
-        for i in range (1, batchsize):
-            n = input_file[i,:]
-            nextbatch = np.append(nextbatch,n)
-        next_batch_array = np.delete(next_batch_array,)'''
+
 
 
 # calculate the number of batches per epoch
@@ -99,26 +100,28 @@ with tf.Session() as sess:
         next_batch_array = input_file  # copy of input file to use for fetching next batch from input array
         for batch_n in range(batch_per_ep):  # batches loop
             batch_img = next_batch(next_batch_array, batch_size, batch_n)  # read a batch
-            #batch_img = batch_img.reshape((-1, 28, 28, 28, 1))  # reshape each sample to an (28, 28) image
             batch_img = resize_batch(batch_img)  # reshape the images to (32, 32)
             _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
 
 
- # test the trained network
+    # test the trained network
     batch_img = next_batch(input_file,10,0)
     batch_img = resize_batch(batch_img)
-    recon_img = sess.run([ae_outputs], feed_dict={ae_inputs: batch_img})[0]
+    recon_img = np.array(sess.run([ae_outputs], feed_dict={ae_inputs: batch_img}))
+    print("this is output image type", type(recon_img))
+    print(recon_img.shape)
+
+    out = recon_img[0,1,:,:,:,0]
+    print(out)
 
     # plot the reconstructed images and their ground truths (inputs)
-    plt.figure(1)
-    plt.title('Reconstructed Images')
-    for i in range(10):
-        plt.subplot(2, 5, i+1)
-        plt.imshow(recon_img[i, ..., 0], cmap='gray')
-    plt.figure(2)
-    plt.title('Input Images')
-    for i in range(10):
-        plt.subplot(2, 5, i+1)
-        plt.imshow(batch_img[i, ..., 0], cmap='gray')
-    plt.show()
+
+    z, x, y = out.nonzero()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, -z, zdir='z', c='red')
+    plt.savefig('reconstruct.png')
+
+    #voxel2obj(reconstruct, voxel_prediction1[0, :, 1, :, :] > cfg.TEST.VOXEL_THRESH)
+
