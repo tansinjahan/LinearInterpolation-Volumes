@@ -13,19 +13,26 @@ batch_size = 10  # Number of samples in each batch
 epoch_num = 5  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 
+def interpolationBetnLatentSpace(z1, z2):
+    mx = 100
+    mn = 0
+    for t in range(mn,mx,1):
+        new_z = (1 - t) * z1 + t * z2
+
+    return new_z
 
 def resize_batch(imgs):
     # A function to resize a batch of MNIST images to (32, 32)
     # Args:
-    #   imgs: a numpy array of size [batch_size, 28 X 28].
+    #   imgs: a numpy array of size [batch_size, 32 X 32 x 32].
     # Returns:
-    #   a numpy array of size [batch_size, 32, 32].
+    #   a numpy array of size [batch_size, 32, 32, 32].
     imgs = imgs.reshape((-1, 32, 32, 32, 1))
 
     resized_imgs = np.zeros((imgs.shape[0], 32, 32, 32, 1))
     for i in range(imgs.shape[0]):
         resized_imgs[i, ..., 0] = transform.resize(imgs[i, ..., 0], (32, 32, 32))
-    print(resized_imgs.shape)
+    print("This is resized image shape", resized_imgs.shape)
     return resized_imgs
 
 
@@ -60,7 +67,7 @@ def autoencoder(inputs):
     print(tf.shape(net))
     net = lays.conv3d(net, 8, [5, 5, 5], stride=4, padding='SAME')
 
-    # latent_space = net
+    latent_space = net
     # decoder
     # 2 x 2 x 2 x 8   ->  8 x 8 x 8 x 16
     # 8 x 8 x 8 x 16  ->  16 x 16 x 16 x 32
@@ -68,7 +75,7 @@ def autoencoder(inputs):
     net = lays.conv3d_transpose(net, 16, [5, 5, 5], stride=4, padding='SAME')
     net = lays.conv3d_transpose(net, 32, [5, 5, 5], stride=2, padding='SAME')
     net = lays.conv3d_transpose(net, 1, [5, 5, 5], stride=2, padding='SAME', activation_fn=tf.nn.tanh)
-    return net
+    return latent_space,net
 
 
 def next_batch(next_batch_array, batchsize, offset):
@@ -85,7 +92,7 @@ batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 5 [i
 
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (MNIST images)
 
-ae_outputs = autoencoder(ae_inputs)  # create the Autoencoder network
+l_space, ae_outputs = autoencoder(ae_inputs)  # create the Autoencoder network
 
 # calculate the loss and optimize the network
 loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs))  # calculate the mean square error loss
@@ -106,22 +113,48 @@ with tf.Session() as sess:
 
 
     # test the trained network
-    batch_img = next_batch(input_file,10,0)
+    #batch_img = next_batch(input_file,1,0)
+
+    # Test for the first input volume shape
+    batch_img = input_file[0,:]
     batch_img = resize_batch(batch_img)
-    recon_img = np.array(sess.run([ae_outputs], feed_dict={ae_inputs: batch_img}))
+    recon_img = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[1]
+    l_space1 = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[0]
     print("this is output image type", type(recon_img))
     print(recon_img.shape)
 
-    out = recon_img[0,1,:,:,:,0]
-    print(out)
+    out = recon_img[0,...,0]
 
+    out = np.reshape(out, (32, 32, 32)).astype(np.float32)
+    print(out)
     # plot the reconstructed images and their ground truths (inputs)
 
     z, x, y = out.nonzero()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, -z, zdir='z', c='red')
-    plt.savefig('reconstruct.png')
+    plt.savefig('reconstruct1.png')
 
-    #voxel2obj(reconstruct, voxel_prediction1[0, :, 1, :, :] > cfg.TEST.VOXEL_THRESH)
+    # Test for the second input volume shape
+    batch_img = input_file[1, :]
+    batch_img = resize_batch(batch_img)
+    recon_img = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[1]
+    l_space2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[0]
+    print("this is output image type", type(recon_img))
+    print(recon_img.shape)
 
+    out = recon_img[0, ..., 0]
+
+    out = np.reshape(out, (32, 32, 32)).astype(np.float32)
+    print(out)
+    # plot the reconstructed images and their ground truths (inputs)
+
+    z, x, y = out.nonzero()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, -z, zdir='z', c='blue')
+    plt.savefig('reconstruct2.png')
+
+
+    new_z = interpolationBetnLatentSpace(l_space1,l_space2)
+    print("This is new  latent space", new_z)

@@ -73,7 +73,7 @@ with tf.Session() as sess:
     # test the trained network
     batch_img, batch_label = mnist.test.next_batch(50)
     batch_img = resize_batch(batch_img)
-    recon_img = sess.run([ae_outputs], feed_dict={ae_inputs: batch_img})[0]
+    recon_img = sess.run([ae_outputs], feed_dict={ae_inputs: batch_img})
 
     # plot the reconstructed images and their ground truths (inputs)
     plt.figure(1)
