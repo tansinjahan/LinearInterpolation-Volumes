@@ -8,7 +8,7 @@ from skimage import transform
 from tensorflow.examples.tutorials.mnist import input_data
 
 batch_size = 500  # Number of samples in each batch
-epoch_num = 5     # Number of epochs to train the network
+epoch_num = 2     # Number of epochs to train the network
 lr = 0.001        # Learning rate
 
 
@@ -34,7 +34,9 @@ def autoencoder(inputs):
     # 8 x 8 x 16    ->  2 x 2 x 8
     net = lays.conv2d(inputs, 32, [5, 5], stride=2, padding='SAME')
     net = lays.conv2d(net, 16, [5, 5], stride=2, padding='SAME')
+
     net = lays.conv2d(net, 8, [5, 5], stride=4, padding='SAME')
+    print("rank of Z", tf.rank(net))
     # decoder
     # 2 x 2 x 8    ->  8 x 8 x 16
     # 8 x 8 x 16   ->  16 x 16 x 32

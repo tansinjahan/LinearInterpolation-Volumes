@@ -3,15 +3,16 @@ import tensorflow.contrib.layers as lays
 
 import tensorflow as tf
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from skimage import transform
-from voxel import voxel2obj
 from mpl_toolkits.mplot3d import Axes3D
-from tensorflow.examples.tutorials.mnist import input_data
+from timeit import default_timer as timer
+import for_plot
 
 batch_size = 10  # Number of samples in each batch
-epoch_num = 5  # Number of epochs to train the network
-lr = 0.001  # Learning rate
+epoch_num = 50  # Number of epochs to train the network
+lr = 0.0001  # Learning rate
 
 def interpolationBetnLatentSpace(z1, z2):
     mx = 100
@@ -44,7 +45,7 @@ def loadfile():
         z, x, y = image_matrix.nonzero()
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(x, y, -z, zdir='z', c='red')
+        ax.scatter(x, y, z, zdir='z', c='red')
         plt.savefig('input_data/demo' + str(i) + '.png')
         input_file = np.append(input_file, image_matrix)
 
@@ -64,9 +65,9 @@ def autoencoder(inputs):
     # 8 x 8 x 8 x 16    ->  2 x 2 x 2 x 8
     net = lays.conv3d(inputs, 32, [5, 5, 5], stride=2, padding='SAME')
     net = lays.conv3d(net, 16, [5, 5, 5], stride=2, padding='SAME')
-    print(tf.shape(net))
     net = lays.conv3d(net, 8, [5, 5, 5], stride=4, padding='SAME')
-
+    print("rank of Z", tf.rank(net))
+    net = lays.fully_connected(net, 1)
     latent_space = net
     # decoder
     # 2 x 2 x 2 x 8   ->  8 x 8 x 8 x 16
@@ -120,41 +121,44 @@ with tf.Session() as sess:
     batch_img = resize_batch(batch_img)
     recon_img = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[1]
     l_space1 = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[0]
-    print("this is output image type", type(recon_img))
+    print("this is test shape type", type(recon_img))
     print(recon_img.shape)
+
+    # plot the output shape of test image
+    #for_plot.plotOutput(recon_img)
+
 
     out = recon_img[0,...,0]
 
     out = np.reshape(out, (32, 32, 32)).astype(np.float32)
-    print(out)
+    print("this is type of the test shape after converting to numpy array", type(out),out.shape)
+    for i in out[0,:,:]:
+        print(i)
+    #print(out)
     # plot the reconstructed images and their ground truths (inputs)
 
-    z, x, y = out.nonzero()
+    # test method 1
+    '''z, x, y = out.nonzero()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, -z, zdir='z', c='red')
-    plt.savefig('reconstruct1.png')
+    #ax.scatter(x, y, -z, zdir='z', c='red')
+    ax.plot(out[:,0],out[:,1],out[:,2])
+    plt.savefig('reconstruct1.png')'''
 
-    # Test for the second input volume shape
-    batch_img = input_file[1, :]
-    batch_img = resize_batch(batch_img)
-    recon_img = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[1]
-    l_space2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[0]
-    print("this is output image type", type(recon_img))
-    print(recon_img.shape)
+    # test method 2
 
-    out = recon_img[0, ..., 0]
-
-    out = np.reshape(out, (32, 32, 32)).astype(np.float32)
-    print(out)
-    # plot the reconstructed images and their ground truths (inputs)
-
-    z, x, y = out.nonzero()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, -z, zdir='z', c='blue')
-    plt.savefig('reconstruct2.png')
+    xdata = out[0, :, :]
+    #print("This is first row",xdata)
+    ydata = out[:, 1, :]
+    zdata = out[:, :, 2]
+    ax.scatter3D(xdata, ydata, zdata, zdir='z', c='red')
+    plt.savefig('output_data/demo' + str(1) + '.png')
 
 
-    new_z = interpolationBetnLatentSpace(l_space1,l_space2)
-    print("This is new  latent space", new_z)
+    '''start = timer()
+    new_z = interpolationBetnLatentSpace(l_space1)
+    vectoradd_time = timer() - start
+    print("Vector Add took %f seconds:", vectoradd_time)
+    print("This is new  latent space", new_z)'''
