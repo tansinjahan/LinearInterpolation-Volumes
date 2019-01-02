@@ -13,6 +13,8 @@ import for_plot
 batch_size = 10  # Number of samples in each batch
 epoch_num = 50  # Number of epochs to train the network
 lr = 0.0001  # Learning rate
+OUTPUT_SIZE = 32 # size of the output volume produced by decoder
+INPUT_SIZE = 32 # size of the input volume given to the encoder
 
 def interpolationBetnLatentSpace(z1, z2):
     mx = 100
@@ -54,10 +56,6 @@ def loadfile():
     return input_file
 
 
-# read dataset
-input_file = loadfile()  # load 50 chairs as volume with shape [50,32768]
-
-
 def autoencoder(inputs):
     # encoder
     # 32 x 32 x 32 x 1   -> 16 x 16 x 16 x 32
@@ -84,11 +82,11 @@ def next_batch(next_batch_array, batchsize, offset):
     rowEnd = (rowStart + batchsize) - 1
     return next_batch_array[rowStart:rowEnd, :]
 
+# --------------------read dataset----------------------
+input_file = loadfile()  # load 50 chairs as volume with shape [50,32768]
 
 
-# calculate the number of batches per epoch
-
-
+# ----------------- calculate the number of batches per epoch --------------------
 batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 5 [input total = 50 divided by batch-size = 10 ]
 
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (MNIST images)
@@ -99,7 +97,7 @@ l_space, ae_outputs = autoencoder(ae_inputs)  # create the Autoencoder network
 loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs))  # calculate the mean square error loss
 train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
-# initialize the network
+# -----------------------initialize the network---------------------------------
 init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
@@ -113,7 +111,7 @@ with tf.Session() as sess:
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
 
 
-    # test the trained network
+    # ------------------test the trained network-------------------------------
     #batch_img = next_batch(input_file,1,0)
 
     # Test for the first input volume shape
@@ -123,39 +121,60 @@ with tf.Session() as sess:
     l_space1 = sess.run([l_space,ae_outputs], feed_dict={ae_inputs: batch_img})[0]
     print("this is test shape type", type(recon_img))
     print(recon_img.shape)
+    out = recon_img[0, ..., 0]
+    #out = np.reshape(out, (32, 32, 32)).astype(np.float32)
 
-    # plot the output shape of test image
-    #for_plot.plotOutput(recon_img)
+
+    # ----------------plot the output shape of test image------------------------------
 
 
-    out = recon_img[0,...,0]
+    z, x, y = out.nonzero()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, zdir='z', c='red')
+    plt.savefig('output_data/demo_testMethod0.png')
 
-    out = np.reshape(out, (32, 32, 32)).astype(np.float32)
     print("this is type of the test shape after converting to numpy array", type(out),out.shape)
     for i in out[0,:,:]:
         print(i)
-    #print(out)
-    # plot the reconstructed images and their ground truths (inputs)
 
-    # test method 1
-    '''z, x, y = out.nonzero()
+    # --------------------------plot the reconstructed images and their ground truths (inputs)----------------------
+
+    # ------------------------Test method 1--------------------------------------------
+    test_first_input = input_file[0,:]
+    test_first_input = np.reshape(test_first_input, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+    z, x, y = test_first_input.nonzero()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    #ax.scatter(x, y, -z, zdir='z', c='red')
-    ax.plot(out[:,0],out[:,1],out[:,2])
-    plt.savefig('reconstruct1.png')'''
+    ax.scatter(x, y, z, zdir='z', c='red')
+    plt.savefig('output_data/demo_testMethod1.png')
 
-    # test method 2
+    # -----------------------------test method 2----------------------------------------
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     xdata = out[0, :, :]
-    #print("This is first row",xdata)
     ydata = out[:, 1, :]
     zdata = out[:, :, 2]
     ax.scatter3D(xdata, ydata, zdata, zdir='z', c='red')
-    plt.savefig('output_data/demo' + str(1) + '.png')
+    plt.savefig('output_data/demo_testMethod2.png')
 
+    # ------------------------------test method 3-----------------------------------------
+    plotOutArr = np.array([])
+    for i in range(0, OUTPUT_SIZE):
+        for j in range(0, OUTPUT_SIZE):
+            for k in range(0, OUTPUT_SIZE):
+                if out[i,j,k] < 0.05:
+                    plotOutArr = np.append(plotOutArr, 1)
+                else:
+                    plotOutArr = np.append(plotOutArr, 0)
+
+    output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+    z, x, y = output_image.nonzero()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, zdir='z', c='red')
+    plt.savefig('output_data/demo_testMethod3.png')
 
     '''start = timer()
     new_z = interpolationBetnLatentSpace(l_space1)
