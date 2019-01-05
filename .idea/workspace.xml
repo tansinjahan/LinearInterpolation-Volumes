@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="9ea7ff75-280d-4115-bb20-cf4646c66e99" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/demo1.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/demo1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/autoencoder_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/autoencoder_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/demo1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/demo_testMethod0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/demo_testMethod2.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/demo_testMethod2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/demo_testMethod3.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/demo_testMethod3.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_autoencoder.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -17,10 +21,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/autoencoder_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="960">
-              <caret line="71" column="57" selection-start-line="71" selection-start-column="57" selection-end-line="71" selection-end-column="57" />
+            <state relative-caret-position="288">
+              <caret line="69" column="40" selection-start-line="69" selection-start-column="40" selection-end-line="69" selection-end-column="40" />
               <folding>
-                <element signature="e#0#64#0" expanded="true" />
+                <element signature="e#48#112#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -47,17 +51,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file:///usr/lib/python3.5/_bootlocale.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="33" selection-start-line="33" selection-end-line="33" />
+            <state relative-caret-position="-2">
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test_autoencoder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="124" column="5" selection-start-line="124" selection-start-column="5" selection-end-line="124" selection-end-column="5" />
+            <state relative-caret-position="280">
+              <caret line="121" column="39" lean-forward="true" selection-start-line="121" selection-start-column="39" selection-end-line="121" selection-end-column="39" />
               <folding>
                 <element signature="e#0#64#0" expanded="true" />
               </folding>
@@ -95,11 +99,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pract.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="135">
-              <caret line="9" column="37" lean-forward="true" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+              <caret line="9" column="37" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
             </state>
           </provider>
         </entry>
@@ -128,10 +132,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/autoencoder_main.py" />
         <option value="$PROJECT_DIR$/for_plot.py" />
-        <option value="$PROJECT_DIR$/test_autoencoder.py" />
         <option value="$PROJECT_DIR$/pract.py" />
+        <option value="$PROJECT_DIR$/autoencoder_main.py" />
+        <option value="$PROJECT_DIR$/test_autoencoder.py" />
       </list>
     </option>
   </component>
@@ -177,7 +181,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.pract">
+  <component name="RunManager" selected="Python.test_autoencoder">
     <configuration name="autoencoder_main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="simple_autoencoder" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -248,9 +252,9 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.pract" />
         <item itemvalue="Python.test_autoencoder" />
         <item itemvalue="Python.autoencoder_main" />
+        <item itemvalue="Python.pract" />
       </list>
     </recent_temporary>
   </component>
@@ -276,8 +280,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.37931034" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.3692142" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.39498433" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.36886102" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -335,16 +339,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/autoencoder_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="960">
-          <caret line="71" column="57" selection-start-line="71" selection-start-column="57" selection-end-line="71" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#64#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/voxel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="840">
@@ -356,13 +350,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2895">
           <caret line="193" selection-start-line="193" selection-end-line="193" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.5/_bootlocale.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="33" selection-start-line="33" selection-end-line="33" />
         </state>
       </provider>
     </entry>
@@ -397,20 +384,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test_autoencoder.py">
+    <entry file="file://$PROJECT_DIR$/pract.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="124" column="5" selection-start-line="124" selection-start-column="5" selection-end-line="124" selection-end-column="5" />
+        <state relative-caret-position="135">
+          <caret line="9" column="37" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python3.5/_bootlocale.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/autoencoder_main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="69" column="40" selection-start-line="69" selection-start-column="40" selection-end-line="69" selection-end-column="40" />
           <folding>
-            <element signature="e#0#64#0" expanded="true" />
+            <element signature="e#48#112#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pract.py">
+    <entry file="file://$PROJECT_DIR$/test_autoencoder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="37" lean-forward="true" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+        <state relative-caret-position="280">
+          <caret line="121" column="39" lean-forward="true" selection-start-line="121" selection-start-column="39" selection-end-line="121" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#64#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

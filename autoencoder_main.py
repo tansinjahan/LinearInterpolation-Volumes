@@ -1,3 +1,4 @@
+# An undercomplete autoencoder on MNIST dataset
 from __future__ import division, print_function, absolute_import
 import tensorflow.contrib.layers as lays
 
@@ -19,11 +20,9 @@ def resize_batch(imgs):
     # Returns:
     #   a numpy array of size [batch_size, 32, 32].
     imgs = imgs.reshape((-1, 28, 28, 1))
-
     resized_imgs = np.zeros((imgs.shape[0], 32, 32, 1))
     for i in range(imgs.shape[0]):
         resized_imgs[i, ..., 0] = transform.resize(imgs[i, ..., 0], (32, 32))
-    print(resized_imgs.shape)
     return resized_imgs
 
 
@@ -34,9 +33,7 @@ def autoencoder(inputs):
     # 8 x 8 x 16    ->  2 x 2 x 8
     net = lays.conv2d(inputs, 32, [5, 5], stride=2, padding='SAME')
     net = lays.conv2d(net, 16, [5, 5], stride=2, padding='SAME')
-
     net = lays.conv2d(net, 8, [5, 5], stride=4, padding='SAME')
-    print("rank of Z", tf.rank(net))
     # decoder
     # 2 x 2 x 8    ->  8 x 8 x 16
     # 8 x 8 x 16   ->  16 x 16 x 32
@@ -75,7 +72,7 @@ with tf.Session() as sess:
     # test the trained network
     batch_img, batch_label = mnist.test.next_batch(50)
     batch_img = resize_batch(batch_img)
-    recon_img = sess.run([ae_outputs], feed_dict={ae_inputs: batch_img})
+    recon_img = sess.run([ae_outputs], feed_dict={ae_inputs: batch_img})[0]
 
     # plot the reconstructed images and their ground truths (inputs)
     plt.figure(1)
