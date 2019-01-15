@@ -61,6 +61,7 @@ init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
     sess.run(init)
+    plot_loss = np.zeros([1, 2])
     for ep in range(epoch_num):  # epochs loop
         for batch_n in range(batch_per_ep):  # batches loop
             batch_img, batch_label = mnist.train.next_batch(batch_size)  # read a batch
@@ -68,6 +69,13 @@ with tf.Session() as sess:
             batch_img = resize_batch(batch_img)                          # reshape the images to (32, 32)
             _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
+            plot_loss = np.append(plot_loss, [[(ep + 1), c]], axis=0)
+
+    print("This is plot_loss with shape", plot_loss[1:, :])
+    plot_loss = plot_loss[1:, 0:]
+    plt.plot(plot_loss[:, 0], plot_loss[:, 1], c='red')
+    plt.savefig('output_data/autoencoder_loss.png')
+
 
     # test the trained network
     batch_img, batch_label = mnist.test.next_batch(50)

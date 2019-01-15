@@ -3,19 +3,19 @@ import tensorflow.contrib.layers as lays
 
 import tensorflow as tf
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.axes
 from skimage import transform
 from mpl_toolkits.mplot3d import Axes3D
 from timeit import default_timer as timer
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 20  # Number of epochs to train the network
+epoch_num = 100  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
-total_input = 50
+total_input = 50 # total input volume
 
 def interpolationBetnLatentSpace(z1, z2):
     mx = 100
@@ -50,6 +50,7 @@ def loadfile():
         ax = input_fig.add_subplot(111, projection='3d')
         ax.scatter(ax_x, ax_y, ax_z, zdir='z', c='red')
         plt.savefig('input_data/demo' + str(i) + '.png')
+        plt.close()
         input_file = np.append(input_file, image_matrix)
 
     input_file = np.reshape(input_file, (50, 32 * 32 * 32))
@@ -114,12 +115,15 @@ with tf.Session() as sess:
             plot_loss = np.append(plot_loss, [[(ep+1), c]], axis=0)
 
     # --------------------plot loss -------------------------------------
-    print("This is plot_loss with shape", plot_loss, plot_loss.shape)
-    #plt.plot(plot_loss[:, 0], plot_loss[:, 1])
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    plt.plot(plot_loss[:, 0], plot_loss[:, 1], c='red')
-    plt.savefig('output_data/loss.png')
+
+    plot_loss = plot_loss[1:, 0:]
+    print("This is plot_loss X and Y ", plot_loss[:, 0], plot_loss[:, 1])
+    loss_fig = plt.figure()
+    ax = loss_fig.add_subplot(111, projection='3d')
+    ax.plot(plot_loss[:, 0], plot_loss[:, 1], c='blue')
+    plt.savefig('output_data/test_loss.png')
+    plt.close()
+
 
     # ------------------test the trained network-------------------------------
     # batch_img = next_batch(input_file,1,0)
@@ -131,6 +135,7 @@ with tf.Session() as sess:
     l_space1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[0]
     print("This is output shape of the decoder", recon_img.shape)
     out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+    avg_of_test_image = out.min()
     print("this is the shape of output volume", out.shape)
 
     # ----------------print the first line of the output shape ------------------------------
@@ -149,6 +154,7 @@ with tf.Session() as sess:
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, zdir='z', c='red')
     plt.savefig('output_data/demo_testMethod1.png')
+    plt.close()
 
     # -----------------------------test method 2----------------------------------------
 
@@ -159,13 +165,14 @@ with tf.Session() as sess:
     zdata = out[:, :, 2]
     ax.scatter3D(xdata, ydata, zdata, zdir='z', c='red')
     plt.savefig('output_data/demo_testMethod2.png')
+    plt.close()
 
     # ------------------------------test method 3-----------------------------------------
     plotOutArr = np.array([])
     for i in range(0, OUTPUT_SIZE):
         for j in range(0, OUTPUT_SIZE):
             for k in range(0, OUTPUT_SIZE):
-                if out[i, j, k] < 0.05:
+                if out[i, j, k] > 0.0001:
                     plotOutArr = np.append(plotOutArr, 1)
                 else:
                     plotOutArr = np.append(plotOutArr, 0)
@@ -176,6 +183,7 @@ with tf.Session() as sess:
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, zdir='z', c='red')
     plt.savefig('output_data/demo_testMethod3.png')
+    plt.close()
 
     # ------------------------------test method 4-----------------------------------------
 
@@ -184,6 +192,7 @@ with tf.Session() as sess:
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, zdir='z', c='red')
     plt.savefig('output_data/demo_testMethod4.png')
+    plt.close()
 
 
     '''start = timer()
