@@ -15,7 +15,7 @@ epoch_num = 100  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
-total_input = 50 # total input volume
+total_input = 100 # total input volume
 
 def interpolationBetnLatentSpace(z1, z2):
     mx = 100
@@ -42,7 +42,7 @@ def resize_batch(imgs):
 
 def loadfile():
     input_file = np.array([])
-    for i in range(21, 71):
+    for i in range(1, (total_input+1)):
         v = np.loadtxt('/home/gigl/Research/simple_autoencoder/Volume of shapes/MyTestFile' + str(i) + '.txt')
         image_matrix = np.reshape(v, (32, 32, 32)).astype(np.float32)
         ax_z, ax_x, ax_y = image_matrix.nonzero()
@@ -53,8 +53,8 @@ def loadfile():
         plt.close()
         input_file = np.append(input_file, image_matrix)
 
-    input_file = np.reshape(input_file, (50, 32 * 32 * 32))
-    print("This is the shape of input for 50 shape", input_file.shape)
+    input_file = np.reshape(input_file, (total_input, 32 * 32 * 32)).astype(np.float32)
+    print("This is the shape of input for 100 shape", input_file.shape)
     return input_file
 
 
@@ -86,10 +86,10 @@ def next_batch(next_batch_array, batchsize, offset):
 
 
 # --------------------read data set----------------------
-input_file = loadfile()  # load 50 chairs as volume with shape [50,32768]
+input_file = loadfile()  # load 100 chairs as volume with shape [100,32768]
 
 # ----------------- calculate the number of batches per epoch --------------------
-batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 5 [input total = 50 divided by batch-size = 10 ]
+batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total = 100 divided by batch-size = 10 ]
 
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (MNIST images)
 
@@ -116,11 +116,8 @@ with tf.Session() as sess:
 
     # --------------------plot loss -------------------------------------
 
-    plot_loss = plot_loss[1:, 0:]
-    print("This is plot_loss X and Y ", plot_loss[:, 0], plot_loss[:, 1])
-    loss_fig = plt.figure()
-    ax = loss_fig.add_subplot(111, projection='3d')
-    ax.plot(plot_loss[:, 0], plot_loss[:, 1], c='blue')
+    plot_loss = plot_loss[1:, 0:] # to eliminate first row as it represents 0 epoch and 0 loss
+    plt.plot(plot_loss[:, 0], plot_loss[:, 1], c='blue')
     plt.savefig('output_data/test_loss.png')
     plt.close()
 
@@ -129,13 +126,13 @@ with tf.Session() as sess:
     # batch_img = next_batch(input_file,1,0)
 
     # Test for the first input volume shape
-    batch_img = input_file[0, :]
+    batch_img = input_file[1, :]
     batch_img = resize_batch(batch_img)
     recon_img = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[1]
     l_space1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[0]
     print("This is output shape of the decoder", recon_img.shape)
     out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-    avg_of_test_image = out.min()
+    #avg_of_test_image = out.min()
     print("this is the shape of output volume", out.shape)
 
     # ----------------print the first line of the output shape ------------------------------
@@ -147,24 +144,13 @@ with tf.Session() as sess:
     # --------------------------plot the reconstructed images and their ground truths (inputs)----------------------
 
     # ------------------------Test method 1--------------------------------------------
-    test_first_input = input_file[0, :]
+    test_first_input = input_file[1, :]
     test_first_input = np.reshape(test_first_input, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
     z, x, y = test_first_input.nonzero()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, zdir='z', c='red')
-    plt.savefig('output_data/demo_testMethod1.png')
-    plt.close()
-
-    # -----------------------------test method 2----------------------------------------
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    xdata = out[0, :, :]
-    ydata = out[:, 1, :]
-    zdata = out[:, :, 2]
-    ax.scatter3D(xdata, ydata, zdata, zdir='z', c='red')
-    plt.savefig('output_data/demo_testMethod2.png')
+    plt.savefig('output_data/demo_testMethod1_second.png')
     plt.close()
 
     # ------------------------------test method 3-----------------------------------------
@@ -172,7 +158,7 @@ with tf.Session() as sess:
     for i in range(0, OUTPUT_SIZE):
         for j in range(0, OUTPUT_SIZE):
             for k in range(0, OUTPUT_SIZE):
-                if out[i, j, k] > 0.0001:
+                if out[i, j, k] > 0.5:
                     plotOutArr = np.append(plotOutArr, 1)
                 else:
                     plotOutArr = np.append(plotOutArr, 0)
@@ -182,16 +168,7 @@ with tf.Session() as sess:
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, zdir='z', c='red')
-    plt.savefig('output_data/demo_testMethod3.png')
-    plt.close()
-
-    # ------------------------------test method 4-----------------------------------------
-
-    z, x, y = out.nonzero()
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, zdir='z', c='red')
-    plt.savefig('output_data/demo_testMethod4.png')
+    plt.savefig('output_data/demo_testMethod3_second.png')
     plt.close()
 
 
