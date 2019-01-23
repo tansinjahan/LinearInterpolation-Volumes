@@ -15,7 +15,8 @@ epoch_num = 100  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
-total_input = 100 # total input volume
+total_train_input = 100 # total input volume [100 volumes]
+total_test_input = 10 # input for testing the network [10 volumes]
 
 def interpolationBetnLatentSpace(z1, z2):
     mx = 100
@@ -42,8 +43,8 @@ def resize_batch(imgs):
 
 def loadfile():
     input_file = np.array([])
-    for i in range(1, (total_input+1)):
-        v = np.loadtxt('/home/gigl/Research/simple_autoencoder/Volume of shapes/MyTestFile' + str(i) + '.txt')
+    for i in range(1, (total_train_input + 1)):
+        v = np.loadtxt('/home/gigl/Research/simple_autoencoder/train_data/MyTestFile' + str(i) + '.txt')
         image_matrix = np.reshape(v, (32, 32, 32)).astype(np.float32)
         ax_z, ax_x, ax_y = image_matrix.nonzero()
         input_fig = plt.figure()
@@ -53,8 +54,8 @@ def loadfile():
         plt.close()
         input_file = np.append(input_file, image_matrix)
 
-    input_file = np.reshape(input_file, (total_input, 32 * 32 * 32)).astype(np.float32)
-    print("This is the shape of input for 100 shape", input_file.shape)
+    input_file = np.reshape(input_file, (total_train_input, 32 * 32 * 32)).astype(np.float32)
+    #print("This is the shape of input for 100 shape", input_file.shape)
     return input_file
 
 
@@ -66,8 +67,8 @@ def autoencoder(inputs):
     net = lays.conv3d(inputs, 32, [5, 5, 5], stride=2, padding='SAME')
     net = lays.conv3d(net, 16, [5, 5, 5], stride=2, padding='SAME')
     net = lays.conv3d(net, 8, [5, 5, 5], stride=4, padding='SAME')
-    #print("rank of Z", tf.rank(net))
-    #net = lays.fully_connected(net, 1)
+    # print("rank of Z", tf.rank(net))
+    # net = lays.fully_connected(net, 1)
     latent_space = net
     # decoder
     # 2 x 2 x 2 x 8   ->  8 x 8 x 8 x 16
@@ -89,7 +90,7 @@ def next_batch(next_batch_array, batchsize, offset):
 input_file = loadfile()  # load 100 chairs as volume with shape [100,32768]
 
 # ----------------- calculate the number of batches per epoch --------------------
-batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total = 100 divided by batch-size = 10 ]
+batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total=100 divided by batch-size = 10 ]
 
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (MNIST images)
 
@@ -121,56 +122,44 @@ with tf.Session() as sess:
     plt.savefig('output_data/test_loss.png')
     plt.close()
 
+    # ------------------test the trained network for test shapes -------------------------------
 
-    # ------------------test the trained network-------------------------------
-    # batch_img = next_batch(input_file,1,0)
+    for i in range(1, (total_test_input + 1)):
+        temp = np.loadtxt('/home/gigl/Research/simple_autoencoder/test_data/TestImg' + str(i) + '.txt')
+        test_img = np.reshape(temp, (32, 32, 32)).astype(np.float32)
+        ax_z, ax_x, ax_y = test_img.nonzero()
+        input_fig = plt.figure()
+        ax = input_fig.add_subplot(111, projection='3d')
+        ax.scatter(ax_x, ax_y, ax_z, zdir='z', c='red')
+        plt.savefig('test_input_data/demo' + str(i) + '.png')
+        plt.close()
+        test_img = np.reshape(test_img, (1, 32 * 32 * 32)).astype(np.float32)
 
-    # Test for the first input volume shape
-    batch_img = input_file[1, :]
-    batch_img = resize_batch(batch_img)
-    recon_img = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[1]
-    l_space1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[0]
-    print("This is output shape of the decoder", recon_img.shape)
-    out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-    #avg_of_test_image = out.min()
-    print("this is the shape of output volume", out.shape)
+        batch_img = resize_batch(test_img)
+        recon_img = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[1]
+        # print("This is output shape of the decoder", recon_img.shape)
+        out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+        # print("this is the shape of output volume", out.shape)
 
-    # ----------------print the first line of the output shape ------------------------------
+        # -------------------------- plot the reconstructed images -------------------------
+        plotOutArr = np.array([])
+        for x_i in range(0, OUTPUT_SIZE):
+            for y_j in range(0, OUTPUT_SIZE):
+                for z_k in range(0, OUTPUT_SIZE):
+                    if out[x_i, y_j, z_k] > 0.5:
+                        plotOutArr = np.append(plotOutArr, 1)
+                    else:
+                        plotOutArr = np.append(plotOutArr, 0)
 
-    print("this is type of the test shape after converting to numpy array", type(out), out.shape)
-    for i in out[0, :, :]:
-        print(i)
-
-    # --------------------------plot the reconstructed images and their ground truths (inputs)----------------------
-
-    # ------------------------Test method 1--------------------------------------------
-    test_first_input = input_file[1, :]
-    test_first_input = np.reshape(test_first_input, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-    z, x, y = test_first_input.nonzero()
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, zdir='z', c='red')
-    plt.savefig('output_data/demo_testMethod1_second.png')
-    plt.close()
-
-    # ------------------------------test method 3-----------------------------------------
-    plotOutArr = np.array([])
-    for i in range(0, OUTPUT_SIZE):
-        for j in range(0, OUTPUT_SIZE):
-            for k in range(0, OUTPUT_SIZE):
-                if out[i, j, k] > 0.5:
-                    plotOutArr = np.append(plotOutArr, 1)
-                else:
-                    plotOutArr = np.append(plotOutArr, 0)
-
-    output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-    z, x, y = output_image.nonzero()
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, zdir='z', c='red')
-    plt.savefig('output_data/demo_testMethod3_second.png')
-    plt.close()
-
+        output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+        z, x, y = output_image.nonzero()
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(x, y, z, zdir='z', c='red')
+        plt.savefig('output_data/test_volume' + str(i) + '.png')
+        plt.close()
+        for_text_save = np.reshape(output_image, (OUTPUT_SIZE * OUTPUT_SIZE * OUTPUT_SIZE))
+        np.savetxt('output_data/test_volume' + str(i) + '.txt', for_text_save)
 
     '''start = timer()
     new_z = interpolationBetnLatentSpace(l_space1)
