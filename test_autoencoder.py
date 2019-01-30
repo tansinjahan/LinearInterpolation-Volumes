@@ -6,12 +6,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.axes
 from skimage import transform
+import model as md
 from mpl_toolkits.mplot3d import Axes3D
 from timeit import default_timer as timer
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 100  # Number of epochs to train the network
+epoch_num = 50  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -19,11 +20,18 @@ total_train_input = 100 # total input volume [100 volumes]
 total_test_input = 10 # input for testing the network [10 volumes]
 
 def interpolationBetnLatentSpace(z1, z2):
-    mx = 100
-    mn = 0
-    for t in range(mn, mx, 1):
-        new_z = (1 - t) * z1 + t * z2
+    maximum = 1
+    minimum = 0
+    interpolated_points = np.linspace(minimum, maximum, 11)
 
+    for t in interpolated_points:
+        ten_p = tf.constant([1-t])
+        ten_p1 = tf.constant([t])
+        #new_z = (1 - t) * z1 + t * z2
+        new_z1 = tf.math.multiply(ten_p, z1)
+        new_z2 = tf.math.multiply(ten_p1, z2)
+        new_z = tf.math.add(new_z1, new_z2)
+        train_interpol_output = md.decoder(new_z)
     return new_z
 
 def resize_batch(imgs):
@@ -58,28 +66,6 @@ def loadfile():
     #print("This is the shape of input for 100 shape", input_file.shape)
     return input_file
 
-
-def autoencoder(inputs):
-    # encoder
-    # 32 x 32 x 32 x 1   -> 16 x 16 x 16 x 32
-    # 16 x 16 x 16 x 32  ->  8 x 8 x 8 x 16
-    # 8 x 8 x 8 x 16    ->  2 x 2 x 2 x 8
-    net = lays.conv3d(inputs, 32, [5, 5, 5], stride=2, padding='SAME')
-    net = lays.conv3d(net, 16, [5, 5, 5], stride=2, padding='SAME')
-    net = lays.conv3d(net, 8, [5, 5, 5], stride=4, padding='SAME')
-    # print("rank of Z", tf.rank(net))
-    # net = lays.fully_connected(net, 1)
-    latent_space = net
-    # decoder
-    # 2 x 2 x 2 x 8   ->  8 x 8 x 8 x 16
-    # 8 x 8 x 8 x 16  ->  16 x 16 x 16 x 32
-    # 16 x 16 x 16 x 32  ->  32 x 32 x 32 x 1
-    net = lays.conv3d_transpose(net, 16, [5, 5, 5], stride=4, padding='SAME')
-    net = lays.conv3d_transpose(net, 32, [5, 5, 5], stride=2, padding='SAME')
-    net = lays.conv3d_transpose(net, 1, [5, 5, 5], stride=2, padding='SAME', activation_fn=tf.nn.tanh)
-    return latent_space, net
-
-
 def next_batch(next_batch_array, batchsize, offset):
     rowStart = offset * batchsize
     rowEnd = (rowStart + batchsize) - 1
@@ -94,7 +80,10 @@ batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [
 
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (MNIST images)
 
-l_space, ae_outputs = autoencoder(ae_inputs)  # create the Autoencoder network
+l_space = md.encoder(ae_inputs)
+ae_outputs = md.decoder(l_space)
+
+#l_space, ae_outputs = autoencoder(ae_inputs)  # create the Autoencoder network
 
 # ----------------- calculate the loss and optimize the network--------------------------------
 loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs))  # calculate the mean square error loss
@@ -123,7 +112,7 @@ with tf.Session() as sess:
     plt.close()
 
     # ------------------test the trained network for test shapes -------------------------------
-
+    #firstTestShape_Zvector =
     for i in range(1, (total_test_input + 1)):
         temp = np.loadtxt('/home/gigl/Research/simple_autoencoder/test_data/TestImg' + str(i) + '.txt')
         test_img = np.reshape(temp, (32, 32, 32)).astype(np.float32)
@@ -161,8 +150,16 @@ with tf.Session() as sess:
         for_text_save = np.reshape(output_image, (OUTPUT_SIZE * OUTPUT_SIZE * OUTPUT_SIZE))
         np.savetxt('output_data/test_volume' + str(i) + '.txt', for_text_save)
 
-    '''start = timer()
-    new_z = interpolationBetnLatentSpace(l_space1)
+    #------------------- Linear Interpolation --------------------------------
+
+    train_shape_1 = resize_batch(input_file[0, :])
+    train_shape_2 = resize_batch(input_file[1, :])
+    train_l_space1, train_output_image1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_1})
+    train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
+    start = timer()
+
+    new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2)
+
     vectoradd_time = timer() - start
-    print("Vector Add took %f seconds:", vectoradd_time)
-    print("This is new  latent space", new_z)'''
+    #print("Vector Add took %f seconds:", vectoradd_time)
+    print("This is the shape of train_l_space1", train_l_space1.shape)
