@@ -12,7 +12,7 @@ from timeit import default_timer as timer
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 50  # Number of epochs to train the network
+epoch_num = 30  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -20,18 +20,25 @@ total_train_input = 100 # total input volume [100 volumes]
 total_test_input = 10 # input for testing the network [10 volumes]
 
 def interpolationBetnLatentSpace(z1, z2):
+    # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
     maximum = 1
     minimum = 0
     interpolated_points = np.linspace(minimum, maximum, 11)
 
     for t in interpolated_points:
-        ten_p = tf.constant([1-t])
-        ten_p1 = tf.constant([t])
-        #new_z = (1 - t) * z1 + t * z2
-        new_z1 = tf.math.multiply(ten_p, z1)
-        new_z2 = tf.math.multiply(ten_p1, z2)
-        new_z = tf.math.add(new_z1, new_z2)
-        train_interpol_output = md.decoder(new_z)
+
+        new_z1 = np.multiply(z1, (1-t))
+        new_z2 = np.multiply(z2, t)
+        new_z = np.add(new_z1, new_z2)
+        print("new z shape before decoder", new_z.shape, type(new_z))
+        if(t == 0.0):
+            print("This is latent vecor of training shape 1 after interpolation", new_z)
+        train_interpol_output = sess.run([an_outputs], feed_dict={decoder_Z_input: new_z})
+        out = np.reshape(train_interpol_output, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+        plot_output(out, OUTPUT_SIZE, t)
+        if (t == 0.0):
+            print("this is the shape of interpolated volume", out.shape)
+
     return new_z
 
 def resize_batch(imgs):
@@ -71,6 +78,26 @@ def next_batch(next_batch_array, batchsize, offset):
     rowEnd = (rowStart + batchsize) - 1
     return next_batch_array[rowStart:rowEnd, :]
 
+def plot_output(out_array, OUTPUT_SIZE, filename):
+    plotOutArr = np.array([])
+    for x_i in range(0, OUTPUT_SIZE):
+        for y_j in range(0, OUTPUT_SIZE):
+            for z_k in range(0, OUTPUT_SIZE):
+                if out_array[x_i, y_j, z_k] > 0.5:
+                    plotOutArr = np.append(plotOutArr, 1)
+                else:
+                    plotOutArr = np.append(plotOutArr, 0)
+
+    output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+    z, x, y = output_image.nonzero()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, zdir='z', c='red')
+    plt.savefig('output_data/test_volume' + str(filename) + '.png')
+    plt.close()
+    for_text_save = np.reshape(output_image, (OUTPUT_SIZE * OUTPUT_SIZE * OUTPUT_SIZE))
+    np.savetxt('output_data/test_volume' + str(filename) + '.txt', for_text_save)
+
 
 # --------------------read data set----------------------
 input_file = loadfile()  # load 100 chairs as volume with shape [100,32768]
@@ -78,12 +105,12 @@ input_file = loadfile()  # load 100 chairs as volume with shape [100,32768]
 # ----------------- calculate the number of batches per epoch --------------------
 batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total=100 divided by batch-size = 10 ]
 
-ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (MNIST images)
+ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (shape volumes)
+decoder_Z_input = tf.placeholder(tf.float32, (None, 2, 2, 2, 8))
 
 l_space = md.encoder(ae_inputs)
 ae_outputs = md.decoder(l_space)
-
-#l_space, ae_outputs = autoencoder(ae_inputs)  # create the Autoencoder network
+an_outputs = md.decoder(decoder_Z_input)
 
 # ----------------- calculate the loss and optimize the network--------------------------------
 loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs))  # calculate the mean square error loss
@@ -131,35 +158,22 @@ with tf.Session() as sess:
         # print("this is the shape of output volume", out.shape)
 
         # -------------------------- plot the reconstructed images -------------------------
-        plotOutArr = np.array([])
-        for x_i in range(0, OUTPUT_SIZE):
-            for y_j in range(0, OUTPUT_SIZE):
-                for z_k in range(0, OUTPUT_SIZE):
-                    if out[x_i, y_j, z_k] > 0.5:
-                        plotOutArr = np.append(plotOutArr, 1)
-                    else:
-                        plotOutArr = np.append(plotOutArr, 0)
-
-        output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-        z, x, y = output_image.nonzero()
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(x, y, z, zdir='z', c='red')
-        plt.savefig('output_data/test_volume' + str(i) + '.png')
-        plt.close()
-        for_text_save = np.reshape(output_image, (OUTPUT_SIZE * OUTPUT_SIZE * OUTPUT_SIZE))
-        np.savetxt('output_data/test_volume' + str(i) + '.txt', for_text_save)
+        plot_output(out, OUTPUT_SIZE, i)
 
     #------------------- Linear Interpolation --------------------------------
 
     train_shape_1 = resize_batch(input_file[0, :])
     train_shape_2 = resize_batch(input_file[1, :])
     train_l_space1, train_output_image1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_1})
+    train_output_image1 = np.reshape(train_output_image1, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+    plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
+    print("This is the type of train_l_space1", type(train_l_space1), train_l_space1.shape)
+    print("This is latent vecor of training shape 1 before interpolation", train_l_space1)
 
     new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2)
 
-    vectoradd_time = timer() - start
-    #print("Vector Add took %f seconds:", vectoradd_time)
+    interpolation_time = timer() - start
+    print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)
