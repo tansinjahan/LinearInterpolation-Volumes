@@ -3,7 +3,28 @@
   <component name="ChangeListManager">
     <list default="true" id="9ea7ff75-280d-4115-bb20-cf4646c66e99" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/autoencoder_loss.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/autoencoder_loss.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_loss.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_loss.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.0.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume0.0.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.0.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume0.0.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.1.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.2.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.30000000000000004.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.30000000000000004.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.4.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.5.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume0.5.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.5.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume0.5.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.6000000000000001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.6000000000000001.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.7000000000000001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.7000000000000001.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.9.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.9.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume1.0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volume1.0.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume1.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume1.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume10.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume10.png" afterDir="false" />
@@ -24,6 +45,8 @@
       <change beforePath="$PROJECT_DIR$/output_data/test_volume8.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume8.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume9.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume9.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume9.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume9.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volumetrainimg.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volumetrainimg.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_autoencoder.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -34,11 +57,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test_autoencoder.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="31" column="37" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="37" />
+            <state relative-caret-position="206">
+              <caret line="84" column="50" lean-forward="true" selection-start-line="84" selection-start-column="50" selection-end-line="84" selection-end-column="50" />
               <folding>
                 <element signature="e#0#64#0" expanded="true" />
               </folding>
@@ -46,11 +69,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/practice.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/autoencoder_main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
+            <state relative-caret-position="240">
+              <caret line="16" column="27" lean-forward="true" selection-start-line="16" selection-start-column="27" selection-end-line="16" selection-end-column="27" />
+              <folding>
+                <element signature="e#48#112#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -58,7 +84,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file:///usr/lib/python3.5/codecs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="446">
+            <state relative-caret-position="4845">
               <caret line="323" selection-start-line="323" selection-end-line="323" />
             </state>
           </provider>
@@ -67,7 +93,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/numpy/core/fromnumeric.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="89">
+            <state relative-caret-position="585">
               <caret line="50" selection-start-line="50" selection-end-line="50" />
             </state>
           </provider>
@@ -94,7 +120,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
+            <state relative-caret-position="1995">
               <caret line="133" column="15" selection-start-line="133" selection-start-column="15" selection-end-line="133" selection-end-column="15" />
             </state>
           </provider>
@@ -103,7 +129,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/for_plot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
+            <state relative-caret-position="420">
               <caret line="32" selection-start-line="32" selection-end-line="32" />
               <folding>
                 <element signature="e#2#12#0" expanded="true" />
@@ -163,10 +189,10 @@
       <list>
         <option value="$PROJECT_DIR$/for_plot.py" />
         <option value="$PROJECT_DIR$/pract.py" />
-        <option value="$PROJECT_DIR$/autoencoder_main.py" />
         <option value="$PROJECT_DIR$/model.py" />
         <option value="$PROJECT_DIR$/practice.py" />
         <option value="$PROJECT_DIR$/test_autoencoder.py" />
+        <option value="$PROJECT_DIR$/autoencoder_main.py" />
       </list>
     </option>
   </component>
@@ -182,6 +208,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -193,7 +220,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -306,8 +332,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.test_autoencoder" />
-        <item itemvalue="Python.practice" />
         <item itemvalue="Python.autoencoder_main" />
+        <item itemvalue="Python.practice" />
         <item itemvalue="Python.pract" />
       </list>
     </recent_temporary>
@@ -329,12 +355,12 @@
     <frame x="64" y="-11" width="1857" height="1092" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11954148" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22489083" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3291536" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2580982" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.4012539" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.24451411" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -400,16 +426,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/autoencoder_main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="735">
-          <caret line="56" column="41" selection-start-line="56" selection-start-column="41" selection-end-line="56" selection-end-column="41" />
-          <folding>
-            <element signature="e#48#112#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python3.5/_bootlocale.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
@@ -421,6 +437,28 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1680">
           <caret line="119" selection-start-line="119" selection-end-line="119" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pract.py" />
+    <entry file="file://$PROJECT_DIR$/practice.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python3.5/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4845">
+          <caret line="323" selection-start-line="323" selection-end-line="323" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/numpy/core/fromnumeric.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="585">
+          <caret line="50" selection-start-line="50" selection-end-line="50" />
         </state>
       </provider>
     </entry>
@@ -438,26 +476,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/matplotlib/projections/__init__.py">
+    <entry file="file://$PROJECT_DIR$/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="855">
-          <caret line="59" selection-start-line="59" selection-end-line="59" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pract.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="1995">
+          <caret line="133" column="15" selection-start-line="133" selection-start-column="15" selection-end-line="133" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/for_plot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
+        <state relative-caret-position="420">
           <caret line="32" selection-start-line="32" selection-end-line="32" />
           <folding>
             <element signature="e#2#12#0" expanded="true" />
@@ -465,31 +493,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/numpy/core/fromnumeric.py">
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/matplotlib/projections/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="89">
-          <caret line="50" selection-start-line="50" selection-end-line="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.5/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="323" selection-start-line="323" selection-end-line="323" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="133" column="15" selection-start-line="133" selection-start-column="15" selection-end-line="133" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/practice.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="25" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="25" />
+        <state relative-caret-position="855">
+          <caret line="59" selection-start-line="59" selection-end-line="59" />
         </state>
       </provider>
     </entry>
@@ -505,10 +512,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test_autoencoder.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="31" column="37" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="37" />
+        <state relative-caret-position="206">
+          <caret line="84" column="50" lean-forward="true" selection-start-line="84" selection-start-column="50" selection-end-line="84" selection-end-column="50" />
           <folding>
             <element signature="e#0#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/autoencoder_main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="27" lean-forward="true" selection-start-line="16" selection-start-column="27" selection-end-line="16" selection-end-column="27" />
+          <folding>
+            <element signature="e#48#112#0" expanded="true" />
           </folding>
         </state>
       </provider>

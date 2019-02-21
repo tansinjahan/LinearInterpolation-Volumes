@@ -12,18 +12,20 @@ from timeit import default_timer as timer
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 30  # Number of epochs to train the network
+epoch_num = 100  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
-total_train_input = 100 # total input volume [100 volumes]
+total_train_input = 400 # total input volume
 total_test_input = 10 # input for testing the network [10 volumes]
+step_for_saving_graph = 50
 
 def interpolationBetnLatentSpace(z1, z2):
     # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
     maximum = 1
     minimum = 0
-    interpolated_points = np.linspace(minimum, maximum, 11)
+    interpolated_points = np.array([0, 0.5, 0.8])
+    # np.linspace(minimum, maximum, 11)
 
     for t in interpolated_points:
 
@@ -31,13 +33,15 @@ def interpolationBetnLatentSpace(z1, z2):
         new_z2 = np.multiply(z2, t)
         new_z = np.add(new_z1, new_z2)
         print("new z shape before decoder", new_z.shape, type(new_z))
-        if(t == 0.0):
+        #saver = tf.train.import_meta_graph('/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt.meta')
+        saver.restore(sess, "/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt")
+        if(t == 0):
             print("This is latent vecor of training shape 1 after interpolation", new_z)
         train_interpol_output = sess.run([an_outputs], feed_dict={decoder_Z_input: new_z})
         out = np.reshape(train_interpol_output, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         plot_output(out, OUTPUT_SIZE, t)
-        if (t == 0.0):
-            print("this is the shape of interpolated volume", out.shape)
+        if (t == 0):
+            print("this is the interpolated volume", out)
 
     return new_z
 
@@ -118,6 +122,7 @@ train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
 # -----------------------initialize the network---------------------------------
 init = tf.global_variables_initializer()
+saver = tf.train.Saver()
 
 with tf.Session() as sess:
     sess.run(init)
@@ -130,7 +135,7 @@ with tf.Session() as sess:
             _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
             plot_loss = np.append(plot_loss, [[(ep+1), c]], axis=0)
-
+    saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt', global_step=step_for_saving_graph, write_meta_graph=False)
     # --------------------plot loss -------------------------------------
 
     plot_loss = plot_loss[1:, 0:] # to eliminate first row as it represents 0 epoch and 0 loss
@@ -169,8 +174,8 @@ with tf.Session() as sess:
     plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
-    print("This is the type of train_l_space1", type(train_l_space1), train_l_space1.shape)
-    print("This is latent vecor of training shape 1 before interpolation", train_l_space1)
+    print("This is the output of decoder before interpolation", train_output_image1)
+    # print("This is latent vecor of training shape 1 before interpolation", train_l_space1)
 
     new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2)
 

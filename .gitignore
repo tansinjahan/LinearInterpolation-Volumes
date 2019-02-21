@@ -3,4 +3,7 @@ venv/
 Volume of shapes/
 input_data/
 __pycache__/
+test_data
+test_input_data
+train_data
 
