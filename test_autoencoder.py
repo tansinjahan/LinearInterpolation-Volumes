@@ -7,12 +7,17 @@ import matplotlib.pyplot as plt
 import matplotlib.axes
 from skimage import transform
 import model as md
+from skimage import measure
 from mpl_toolkits.mplot3d import Axes3D
 from timeit import default_timer as timer
+import time
+import shutil
+from subprocess import call
+import subprocess
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 100  # Number of epochs to train the network
+epoch_num = 50  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -20,7 +25,7 @@ total_train_input = 400 # total input volume
 total_test_input = 10 # input for testing the network [10 volumes]
 step_for_saving_graph = 50
 
-def interpolationBetnLatentSpace(z1, z2):
+def interpolationBetnLatentSpace(z1, z2, save_path):
     # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
     maximum = 1
     minimum = 0
@@ -33,8 +38,8 @@ def interpolationBetnLatentSpace(z1, z2):
         new_z2 = np.multiply(z2, t)
         new_z = np.add(new_z1, new_z2)
         print("new z shape before decoder", new_z.shape, type(new_z))
-        #saver = tf.train.import_meta_graph('/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt.meta')
-        saver.restore(sess, "/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt")
+        saver = tf.train.import_meta_graph(save_path + '.meta')
+        saver.restore(sess, save_path + '.meta')
         if(t == 0):
             print("This is latent vecor of training shape 1 after interpolation", new_z)
         train_interpol_output = sess.run([an_outputs], feed_dict={decoder_Z_input: new_z})
@@ -59,6 +64,8 @@ def resize_batch(imgs):
     print("This is resized image shape", resized_imgs.shape)
     return resized_imgs
 
+def cmd_exists(cmd):
+    return shutil.which(cmd) is not None
 
 def loadfile():
     input_file = np.array([])
@@ -93,6 +100,22 @@ def plot_output(out_array, OUTPUT_SIZE, filename):
                     plotOutArr = np.append(plotOutArr, 0)
 
     output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+
+    # Use marching cubes to obtain the surface mesh of these ellipsoids
+    verts, faces, normals, values = measure.marching_cubes_lewiner(output_image, 0)
+    faces = faces + 1
+    for_save = open('output_data/test_volume' + str(filename) + '.obj', 'w')
+    for item in verts:
+        for_save.write("v {0} {1} {2}\n".format(item[0], item[1], item[2]))
+
+    for item in normals:
+        for_save.write("vn {0} {1} {2}\n".format(item[0], item[1], item[2]))
+
+    for item in faces:
+        for_save.write("f {0}//{0} {1}//{1} {2}//{2}\n".format(item[0], item[1], item[2]))
+
+    for_save.close()
+
     z, x, y = output_image.nonzero()
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -135,7 +158,7 @@ with tf.Session() as sess:
             _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
             plot_loss = np.append(plot_loss, [[(ep+1), c]], axis=0)
-    saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt', global_step=step_for_saving_graph, write_meta_graph=False)
+
     # --------------------plot loss -------------------------------------
 
     plot_loss = plot_loss[1:, 0:] # to eliminate first row as it represents 0 epoch and 0 loss
@@ -158,13 +181,19 @@ with tf.Session() as sess:
 
         batch_img = resize_batch(test_img)
         recon_img = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[1]
-        # print("This is output shape of the decoder", recon_img.shape)
         out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         # print("this is the shape of output volume", out.shape)
 
         # -------------------------- plot the reconstructed images -------------------------
         plot_output(out, OUTPUT_SIZE, i)
-
+        '''if cmd_exists('meshlab'):
+            proc1 = subprocess.Popen(['meshlab', 'output_data/test_volume' + str(i) + '.obj'])
+            # time.sleep(2.0)
+            # subprocess.Popen.kill(proc1)
+        else:
+            print('Meshlab not found: please use visualization of your choice to view')'''
+    save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt')
+    print("the model checkpoints save path is %s" % save_path)
     #------------------- Linear Interpolation --------------------------------
 
     train_shape_1 = resize_batch(input_file[0, :])
@@ -175,9 +204,9 @@ with tf.Session() as sess:
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
     print("This is the output of decoder before interpolation", train_output_image1)
-    # print("This is latent vecor of training shape 1 before interpolation", train_l_space1)
+    # print("This is latent vector of training shape 1 before interpolation", train_l_space1)
 
-    new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2)
+    new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
 
     interpolation_time = timer() - start
     print("Interpolation took %f seconds:", interpolation_time)
