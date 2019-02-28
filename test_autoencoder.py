@@ -4,16 +4,13 @@ import tensorflow.contrib.layers as lays
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.axes
+import meshlab_visualize
 from skimage import transform
 import model as md
 from skimage import measure
 from mpl_toolkits.mplot3d import Axes3D
 from timeit import default_timer as timer
-import time
-import shutil
-from subprocess import call
-import subprocess
+
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
@@ -64,9 +61,6 @@ def resize_batch(imgs):
     print("This is resized image shape", resized_imgs.shape)
     return resized_imgs
 
-def cmd_exists(cmd):
-    return shutil.which(cmd) is not None
-
 def loadfile():
     input_file = np.array([])
     for i in range(1, (total_train_input + 1)):
@@ -101,7 +95,7 @@ def plot_output(out_array, OUTPUT_SIZE, filename):
 
     output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
 
-    # Use marching cubes to obtain the surface mesh of these ellipsoids
+    # Use marching cubes to obtain the surface mesh of these volumes
     verts, faces, normals, values = measure.marching_cubes_lewiner(output_image, 0)
     faces = faces + 1
     for_save = open('output_data/test_volume' + str(filename) + '.obj', 'w')
@@ -186,12 +180,7 @@ with tf.Session() as sess:
 
         # -------------------------- plot the reconstructed images -------------------------
         plot_output(out, OUTPUT_SIZE, i)
-        '''if cmd_exists('meshlab'):
-            proc1 = subprocess.Popen(['meshlab', 'output_data/test_volume' + str(i) + '.obj'])
-            # time.sleep(2.0)
-            # subprocess.Popen.kill(proc1)
-        else:
-            print('Meshlab not found: please use visualization of your choice to view')'''
+
     save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt')
     print("the model checkpoints save path is %s" % save_path)
     #------------------- Linear Interpolation --------------------------------
@@ -205,9 +194,10 @@ with tf.Session() as sess:
     start = timer()
     print("This is the output of decoder before interpolation", train_output_image1)
     # print("This is latent vector of training shape 1 before interpolation", train_l_space1)
-
+    meshlab_visualize.meshlab_output()
     new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
 
     interpolation_time = timer() - start
     print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)
+
