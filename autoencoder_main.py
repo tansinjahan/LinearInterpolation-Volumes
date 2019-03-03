@@ -58,7 +58,7 @@ train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
 # initialize the network
 init = tf.global_variables_initializer()
-
+saver = tf.train.Saver()
 with tf.Session() as sess:
     sess.run(init)
     plot_loss = np.zeros([1, 2])
@@ -70,7 +70,8 @@ with tf.Session() as sess:
             _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
             plot_loss = np.append(plot_loss, [[(ep + 1), c]], axis=0)
-
+    save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/MNIST_data/model.ckpt')
+    print("the model checkpoints save path is %s" % save_path)
     print("This is plot_loss with shape", plot_loss[1:, :])
     plot_loss = plot_loss[1:, 0:]
     plt.plot(plot_loss[:, 0], plot_loss[:, 1], c='red')
@@ -80,6 +81,8 @@ with tf.Session() as sess:
     # test the trained network
     batch_img, batch_label = mnist.test.next_batch(50)
     batch_img = resize_batch(batch_img)
+    saver = tf.train.import_meta_graph(save_path + '.meta')
+    saver.restore(sess, save_path)
     recon_img = sess.run([ae_outputs], feed_dict={ae_inputs: batch_img})[0]
 
     # plot the reconstructed images and their ground truths (inputs)

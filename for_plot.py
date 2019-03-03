@@ -1,32 +1,41 @@
+from __future__ import division, print_function, absolute_import
 
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage import measure
 
-import sys
-import shutil
-import subprocess
-from config import cfg, cfg_from_list
-from voxel import voxel2obj
+def plot_output(out_array, OUTPUT_SIZE, filename):
+    plotOutArr = np.array([])
+    for x_i in range(0, OUTPUT_SIZE):
+        for y_j in range(0, OUTPUT_SIZE):
+            for z_k in range(0, OUTPUT_SIZE):
+                if out_array[x_i, y_j, z_k] > 0.5:
+                    plotOutArr = np.append(plotOutArr, 1)
+                else:
+                    plotOutArr = np.append(plotOutArr, 0)
 
+    output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
 
-def cmd_exists(cmd):
-    return shutil.which(cmd) is not None
+    # Use marching cubes to obtain the surface mesh of these volumes
+    verts, faces, normals, values = measure.marching_cubes_lewiner(output_image, 0)
+    faces = faces + 1
+    for_save = open('output_data/test_volume' + str(filename) + '.obj', 'w')
+    for item in verts:
+        for_save.write("v {0} {1} {2}\n".format(item[0], item[1], item[2]))
 
-def plotOutput(voxel_prediction):
-    '''Main demo function'''
+    for item in normals:
+        for_save.write("vn {0} {1} {2}\n".format(item[0], item[1], item[2]))
 
-    # Save prediction into a file named 'prediction.obj' or the given argument
-    pred_file_name = sys.argv[1] if len(sys.argv) > 1 else 'prediction.obj'
+    for item in faces:
+        for_save.write("f {0}//{0} {1}//{1} {2}//{2}\n".format(item[0], item[1], item[2]))
 
-    # Save the prediction to an OBJ file (mesh file).
-    voxel2obj(pred_file_name, voxel_prediction[0, :, :, :, 0] > cfg.TEST.VOXEL_THRESH)
+    for_save.close()
 
-
-    # Use meshlab or other mesh viewers to visualize the prediction.
-    # For Ubuntu>=14.04, you can install meshlab using
-    # `sudo apt-get install meshlab`
-    if cmd_exists('meshlab'):
-        proc1 = subprocess.Popen(['meshlab', pred_file_name])
-        #subprocess.Popen.kill(proc1)
-        #subprocess.Popen.kill(proc2)
-    else:
-        print('Meshlab not found: please use visualization of your choice to view %s' %pred_file_name)
-
+    z, x, y = output_image.nonzero()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, zdir='z', c='red')
+    plt.savefig('output_data/test_volume' + str(filename) + '.png')
+    plt.close()
+    for_text_save = np.reshape(output_image, (OUTPUT_SIZE * OUTPUT_SIZE * OUTPUT_SIZE))
+    np.savetxt('output_data/test_volume' + str(filename) + '.txt', for_text_save)

@@ -1,4 +1,4 @@
-import numpy as np
+from __future__ import division, print_function, absolute_import
 import shutil
 import subprocess
 import glob
@@ -10,7 +10,6 @@ def meshlab_output():
     path = '/home/gigl/Research/simple_autoencoder/output_data/'
     if cmd_exists('meshlab'):
         filecounter = len(glob.glob1(path,'*.obj'))
-        print("Filecounter{}" .format(filecounter))
         for i in range(1, filecounter):
             proc1 = subprocess.Popen(['meshlab', path + 'test_volume' + str(i) + '.obj'])
     else:

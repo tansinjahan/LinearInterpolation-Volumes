@@ -1,20 +1,18 @@
 from __future__ import division, print_function, absolute_import
-import tensorflow.contrib.layers as lays
 
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-import meshlab_visualize
 from skimage import transform
-import model as md
-from skimage import measure
-from mpl_toolkits.mplot3d import Axes3D
 from timeit import default_timer as timer
-
+from mpl_toolkits.mplot3d import Axes3D
+import meshlab_visualize
+import model as md
+import for_plot
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 50  # Number of epochs to train the network
+epoch_num = 80  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -36,12 +34,12 @@ def interpolationBetnLatentSpace(z1, z2, save_path):
         new_z = np.add(new_z1, new_z2)
         print("new z shape before decoder", new_z.shape, type(new_z))
         saver = tf.train.import_meta_graph(save_path + '.meta')
-        saver.restore(sess, save_path + '.meta')
+        saver.restore(sess, save_path)
         if(t == 0):
             print("This is latent vecor of training shape 1 after interpolation", new_z)
         train_interpol_output = sess.run([an_outputs], feed_dict={decoder_Z_input: new_z})
         out = np.reshape(train_interpol_output, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-        plot_output(out, OUTPUT_SIZE, t)
+        for_plot.plot_output(out, OUTPUT_SIZE, t)
         if (t == 0):
             print("this is the interpolated volume", out)
 
@@ -75,49 +73,12 @@ def loadfile():
         input_file = np.append(input_file, image_matrix)
 
     input_file = np.reshape(input_file, (total_train_input, 32 * 32 * 32)).astype(np.float32)
-    #print("This is the shape of input for 100 shape", input_file.shape)
     return input_file
 
 def next_batch(next_batch_array, batchsize, offset):
     rowStart = offset * batchsize
     rowEnd = (rowStart + batchsize) - 1
     return next_batch_array[rowStart:rowEnd, :]
-
-def plot_output(out_array, OUTPUT_SIZE, filename):
-    plotOutArr = np.array([])
-    for x_i in range(0, OUTPUT_SIZE):
-        for y_j in range(0, OUTPUT_SIZE):
-            for z_k in range(0, OUTPUT_SIZE):
-                if out_array[x_i, y_j, z_k] > 0.5:
-                    plotOutArr = np.append(plotOutArr, 1)
-                else:
-                    plotOutArr = np.append(plotOutArr, 0)
-
-    output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-
-    # Use marching cubes to obtain the surface mesh of these volumes
-    verts, faces, normals, values = measure.marching_cubes_lewiner(output_image, 0)
-    faces = faces + 1
-    for_save = open('output_data/test_volume' + str(filename) + '.obj', 'w')
-    for item in verts:
-        for_save.write("v {0} {1} {2}\n".format(item[0], item[1], item[2]))
-
-    for item in normals:
-        for_save.write("vn {0} {1} {2}\n".format(item[0], item[1], item[2]))
-
-    for item in faces:
-        for_save.write("f {0}//{0} {1}//{1} {2}//{2}\n".format(item[0], item[1], item[2]))
-
-    for_save.close()
-
-    z, x, y = output_image.nonzero()
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, zdir='z', c='red')
-    plt.savefig('output_data/test_volume' + str(filename) + '.png')
-    plt.close()
-    for_text_save = np.reshape(output_image, (OUTPUT_SIZE * OUTPUT_SIZE * OUTPUT_SIZE))
-    np.savetxt('output_data/test_volume' + str(filename) + '.txt', for_text_save)
 
 
 # --------------------read data set----------------------
@@ -139,10 +100,10 @@ train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
 # -----------------------initialize the network---------------------------------
 init = tf.global_variables_initializer()
-saver = tf.train.Saver()
 
 with tf.Session() as sess:
     sess.run(init)
+    saver = tf.train.Saver()
     plot_loss = np.zeros([1, 2])
     for ep in range(epoch_num):  # epochs loop
         next_batch_array = input_file  # copy of input file to use for fetching next batch from input array
@@ -153,6 +114,8 @@ with tf.Session() as sess:
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
             plot_loss = np.append(plot_loss, [[(ep+1), c]], axis=0)
 
+    save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt')
+    print("the model checkpoints save path is %s" % save_path)
     # --------------------plot loss -------------------------------------
 
     plot_loss = plot_loss[1:, 0:] # to eliminate first row as it represents 0 epoch and 0 loss
@@ -161,7 +124,7 @@ with tf.Session() as sess:
     plt.close()
 
     # ------------------test the trained network for test shapes -------------------------------
-    #firstTestShape_Zvector =
+
     for i in range(1, (total_test_input + 1)):
         temp = np.loadtxt('/home/gigl/Research/simple_autoencoder/test_data/TestImg' + str(i) + '.txt')
         test_img = np.reshape(temp, (32, 32, 32)).astype(np.float32)
@@ -176,28 +139,26 @@ with tf.Session() as sess:
         batch_img = resize_batch(test_img)
         recon_img = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[1]
         out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-        # print("this is the shape of output volume", out.shape)
 
         # -------------------------- plot the reconstructed images -------------------------
-        plot_output(out, OUTPUT_SIZE, i)
+        for_plot.plot_output(out, OUTPUT_SIZE, i)
 
-    save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt')
-    print("the model checkpoints save path is %s" % save_path)
     #------------------- Linear Interpolation --------------------------------
 
     train_shape_1 = resize_batch(input_file[0, :])
     train_shape_2 = resize_batch(input_file[1, :])
     train_l_space1, train_output_image1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_1})
     train_output_image1 = np.reshape(train_output_image1, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
-    plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
+    for_plot.plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
     print("This is the output of decoder before interpolation", train_output_image1)
     # print("This is latent vector of training shape 1 before interpolation", train_l_space1)
-    meshlab_visualize.meshlab_output()
+
     new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
 
     interpolation_time = timer() - start
     print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)
+    meshlab_visualize.meshlab_output()
 
