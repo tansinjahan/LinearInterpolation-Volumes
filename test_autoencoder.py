@@ -12,7 +12,7 @@ import for_plot
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 80  # Number of epochs to train the network
+epoch_num = 100  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -20,12 +20,12 @@ total_train_input = 400 # total input volume
 total_test_input = 10 # input for testing the network [10 volumes]
 step_for_saving_graph = 50
 
+
 def interpolationBetnLatentSpace(z1, z2, save_path):
     # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
     maximum = 1
     minimum = 0
-    interpolated_points = np.array([0, 0.5, 0.8])
-    # np.linspace(minimum, maximum, 11)
+    interpolated_points = np.linspace(minimum, maximum, 11)
 
     for t in interpolated_points:
 
@@ -35,18 +35,24 @@ def interpolationBetnLatentSpace(z1, z2, save_path):
         print("new z shape before decoder", new_z.shape, type(new_z))
         saver = tf.train.import_meta_graph(save_path + '.meta')
         saver.restore(sess, save_path)
+        variables_names = [s.name for s in tf.trainable_variables()]
+        values = sess.run(variables_names)
+        file = open("variables_after_restoring.txt", "a+")
+        for k, v in zip(variables_names, values):
+            file.write("Variables:{}, Shape:{}, Values:{}".format(k, (v.shape), v))
         if(t == 0):
-            print("This is latent vecor of training shape 1 after interpolation", new_z)
-        train_interpol_output = sess.run([an_outputs], feed_dict={decoder_Z_input: new_z})
+            print("This is latent vector of training shape 1 after interpolation", new_z)
+        train_interpol_output = sess.run([ae_outputs], feed_dict={l_space: new_z})
         out = np.reshape(train_interpol_output, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         for_plot.plot_output(out, OUTPUT_SIZE, t)
         if (t == 0):
-            print("this is the interpolated volume", out)
+            print("this is the output shape after interpolation", out)
 
     return new_z
 
+
 def resize_batch(imgs):
-    # A function to resize a batch of MNIST images to (32, 32)
+    # A function to resize a batch of shape images to (32, 32, 32)
     # Args:
     #   imgs: a numpy array of size [batch_size, 32 X 32 x 32].
     # Returns:
@@ -58,6 +64,7 @@ def resize_batch(imgs):
         resized_imgs[i, ..., 0] = transform.resize(imgs[i, ..., 0], (32, 32, 32))
     print("This is resized image shape", resized_imgs.shape)
     return resized_imgs
+
 
 def loadfile():
     input_file = np.array([])
@@ -75,6 +82,7 @@ def loadfile():
     input_file = np.reshape(input_file, (total_train_input, 32 * 32 * 32)).astype(np.float32)
     return input_file
 
+
 def next_batch(next_batch_array, batchsize, offset):
     rowStart = offset * batchsize
     rowEnd = (rowStart + batchsize) - 1
@@ -82,20 +90,18 @@ def next_batch(next_batch_array, batchsize, offset):
 
 
 # --------------------read data set----------------------
-input_file = loadfile()  # load 100 chairs as volume with shape [100,32768]
+input_file = loadfile()  # load 400 chairs as volume with shape [400,32768]
 
 # ----------------- calculate the number of batches per epoch --------------------
 batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total=100 divided by batch-size = 10 ]
 
-ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1))  # input to the network (shape volumes)
-decoder_Z_input = tf.placeholder(tf.float32, (None, 2, 2, 2, 8))
+ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1), name="encoder_input")  # input to the network (shape volumes)
 
 l_space = md.encoder(ae_inputs)
 ae_outputs = md.decoder(l_space)
-an_outputs = md.decoder(decoder_Z_input)
 
-# ----------------- calculate the loss and optimize the network--------------------------------
-loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs))  # calculate the mean square error loss
+# ----------------- calculate the loss and optimize the network --------------------------------
+loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs), name="cost")  # calculate the mean square error loss
 train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
 # -----------------------initialize the network---------------------------------
@@ -109,13 +115,19 @@ with tf.Session() as sess:
         next_batch_array = input_file  # copy of input file to use for fetching next batch from input array
         for batch_n in range(batch_per_ep):  # batches loop
             batch_img = next_batch(next_batch_array, batch_size, batch_n)  # read a batch
-            batch_img = resize_batch(batch_img)  # reshape the images to (32, 32)
+            batch_img = resize_batch(batch_img)  # reshape the images to (32, 32, 32)
             _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
             plot_loss = np.append(plot_loss, [[(ep+1), c]], axis=0)
 
     save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt')
     print("the model checkpoints save path is %s" % save_path)
+    variables_names = [v.name for v in tf.trainable_variables()]
+    values = sess.run(variables_names)
+    file = open("variables_after_training.txt", "a+")
+    for k, v in zip(variables_names, values):
+        file.write("Variables:{}, Shape:{}, Values:{}".format(k,(v.shape),v))
+
     # --------------------plot loss -------------------------------------
 
     plot_loss = plot_loss[1:, 0:] # to eliminate first row as it represents 0 epoch and 0 loss
@@ -143,7 +155,7 @@ with tf.Session() as sess:
         # -------------------------- plot the reconstructed images -------------------------
         for_plot.plot_output(out, OUTPUT_SIZE, i)
 
-    #------------------- Linear Interpolation --------------------------------
+    # ------------------- Linear Interpolation --------------------------------
 
     train_shape_1 = resize_batch(input_file[0, :])
     train_shape_2 = resize_batch(input_file[1, :])
@@ -152,13 +164,12 @@ with tf.Session() as sess:
     for_plot.plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
-    print("This is the output of decoder before interpolation", train_output_image1)
-    # print("This is latent vector of training shape 1 before interpolation", train_l_space1)
+    print("This is the output of decoder before interpolation", train_l_space1)
 
-    new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
-
-    interpolation_time = timer() - start
-    print("Interpolation took %f seconds:", interpolation_time)
+    #new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
+    print("This is the shape before interpolation", train_output_image1)
+    #interpolation_time = timer() - start
+    #print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)
-    meshlab_visualize.meshlab_output()
+    #meshlab_visualize.meshlab_output()
 
