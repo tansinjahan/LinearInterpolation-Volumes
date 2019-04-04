@@ -2,15 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ea7ff75-280d-4115-bb20-cf4646c66e99" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screenshot/interpolation.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.data-00000-of-00001" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.index" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/for_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/for_plot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interpolation.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/meshlab_visualize.py" beforeDir="false" afterPath="$PROJECT_DIR$/meshlab_visualize.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/autoencoder_loss.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/autoencoder_loss.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_loss.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_loss.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume0.0.obj" beforeDir="false" />
@@ -82,17 +79,6 @@
       <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.obj" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volumetrainimg.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volumetrainimg.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_autoencoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo1.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo10.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo10.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo2.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo2.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo3.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo4.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo5.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo5.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo6.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo6.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo7.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo7.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo8.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo8.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo9.png" beforeDir="false" afterPath="$PROJECT_DIR$/test_input_data/demo9.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables_after_restoring.txt" beforeDir="false" afterPath="$PROJECT_DIR$/variables_after_restoring.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables_after_training.txt" beforeDir="false" afterPath="$PROJECT_DIR$/variables_after_training.txt" afterDir="false" />
     </list>
@@ -164,14 +150,24 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/model2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="705">
-              <caret line="47" column="121" selection-start-line="47" selection-start-column="121" selection-end-line="47" selection-end-column="121" />
+            <state relative-caret-position="480">
+              <caret line="32" column="35" lean-forward="true" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
               <folding>
                 <element signature="e#0#64#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor />
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -239,6 +235,11 @@
             <path>
               <item name="simple_autoencoder" type="b2602c69:ProjectViewProjectNode" />
               <item name="simple_autoencoder" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="simple_autoencoder" type="b2602c69:ProjectViewProjectNode" />
+              <item name="simple_autoencoder" type="462c0819:PsiDirectoryNode" />
+              <item name="screenshot" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -350,9 +351,9 @@
     </configuration>
     <list>
       <item itemvalue="Python.autoencoder_main" />
+      <item itemvalue="Python.test_autoencoder" />
       <item itemvalue="Python.pract" />
       <item itemvalue="Python.practice" />
-      <item itemvalue="Python.test_autoencoder" />
     </list>
     <recent_temporary>
       <list>
@@ -374,13 +375,27 @@
       <option name="presentableId" value="Default" />
       <updated>1542324131577</updated>
     </task>
+    <task id="LOCAL-00001" summary="Vae loss function added">
+      <created>1554347473850</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1554347473850</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added vae model(model 2)">
+      <created>1554347576897</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1554347576897</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18504366" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18504366" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -400,6 +415,11 @@
       <window_info anchor="right" id="R Graphics" order="3" />
       <window_info anchor="right" id="R Packages" order="4" />
     </layout>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Vae loss function added" />
+    <MESSAGE value="added vae model(model 2)" />
+    <option name="LAST_COMMIT_MESSAGE" value="added vae model(model 2)" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/venv/lib/python3.5/site-packages/skimage/transform/_warps.py">
@@ -645,11 +665,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/model2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="705">
-          <caret line="47" column="121" selection-start-line="47" selection-start-column="121" selection-end-line="47" selection-end-column="121" />
+        <state relative-caret-position="480">
+          <caret line="32" column="35" lean-forward="true" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
           <folding>
             <element signature="e#0#64#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor />
+          <second_editor />
         </state>
       </provider>
     </entry>
