@@ -14,4 +14,3 @@ def meshlab_output():
             proc1 = subprocess.Popen(['meshlab', path + 'test_volume' + str(i) + '.obj'])
     else:
         print('Meshlab not found: please use visualization of your choice to view')
-

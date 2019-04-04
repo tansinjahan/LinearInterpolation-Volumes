@@ -6,4 +6,8 @@ __pycache__/
 test_data
 test_input_data
 train_data
+variables_after_restoring.txt
+variables_after_training.txt
+checkpoints/
+output_data/
 

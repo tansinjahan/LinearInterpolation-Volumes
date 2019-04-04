@@ -7,17 +7,19 @@ from skimage import transform
 from timeit import default_timer as timer
 from mpl_toolkits.mplot3d import Axes3D
 import meshlab_visualize
-import model as md
+import model2 as md
 import for_plot
+
+#import theano.tensor as T
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 100  # Number of epochs to train the network
+epoch_num = 50  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
 total_train_input = 400 # total input volume
-total_test_input = 10 # input for testing the network [10 volumes]
+total_test_input = 20 # input for testing the network [10 volumes]
 step_for_saving_graph = 50
 
 
@@ -32,7 +34,7 @@ def interpolationBetnLatentSpace(z1, z2, save_path):
         new_z1 = np.multiply(z1, (1-t))
         new_z2 = np.multiply(z2, t)
         new_z = np.add(new_z1, new_z2)
-        print("new z shape before decoder", new_z.shape, type(new_z))
+        #print("new z shape before decoder", new_z.shape, type(new_z))
         saver = tf.train.import_meta_graph(save_path + '.meta')
         saver.restore(sess, save_path)
         variables_names = [s.name for s in tf.trainable_variables()]
@@ -40,13 +42,12 @@ def interpolationBetnLatentSpace(z1, z2, save_path):
         file = open("variables_after_restoring.txt", "a+")
         for k, v in zip(variables_names, values):
             file.write("Variables:{}, Shape:{}, Values:{}".format(k, (v.shape), v))
-        if(t == 0):
-            print("This is latent vector of training shape 1 after interpolation", new_z)
+
         train_interpol_output = sess.run([ae_outputs], feed_dict={l_space: new_z})
         out = np.reshape(train_interpol_output, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         for_plot.plot_output(out, OUTPUT_SIZE, t)
         if (t == 0):
-            print("this is the output shape after interpolation", out)
+            print("this is the output shape of decoder after interpolation", out)
 
     return new_z
 
@@ -85,7 +86,7 @@ def loadfile():
 
 def next_batch(next_batch_array, batchsize, offset):
     rowStart = offset * batchsize
-    rowEnd = (rowStart + batchsize) - 1
+    rowEnd = (rowStart + batchsize)
     return next_batch_array[rowStart:rowEnd, :]
 
 
@@ -93,16 +94,70 @@ def next_batch(next_batch_array, batchsize, offset):
 input_file = loadfile()  # load 400 chairs as volume with shape [400,32768]
 
 # ----------------- calculate the number of batches per epoch --------------------
-batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total=100 divided by batch-size = 10 ]
+batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total= 400 divided by batch-size = 10 ]
 
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1), name="encoder_input")  # input to the network (shape volumes)
 
-l_space = md.encoder(ae_inputs)
+# ---------for variational auto encoder(this has to be commented when simple auto encoder model is used) --------------
+z_mean, z_std, l_space = md.encoder(ae_inputs)
+
+# ---------for simple auto encoder(this has to be commented when variational model is used) --------------
+#l_space = md.encoder(ae_inputs)
+
+# --------- Output from decoder ---------------------
 ae_outputs = md.decoder(l_space)
 
-# ----------------- calculate the loss and optimize the network --------------------------------
-loss = tf.reduce_mean(tf.square(ae_outputs - ae_inputs), name="cost")  # calculate the mean square error loss
-train_op = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
+
+# ----------------- calculate the loss and optimize the variational auto encoder network ------------------------
+
+#generation_loss = -tf.reduce_sum(ae_inputs * tf.log(1e-8 + ae_outputs) + (1-ae_inputs) * tf.log(1e-8 + 1 - ae_outputs), 1)
+
+#latent_loss = 0.5 * tf.reduce_sum(tf.square(z_mean) + tf.square(z_std) - tf.log(tf.square(z_std)) - 1,1)
+
+# -------- loss functions from Generative and Discriminative VOXEL modeling paper ------
+# Weighted binary cross-entropy for use in voxel loss. Allows weighting of false positives relative to false negatives.
+# Nominally set to strongly penalize false negatives
+def weighted_binary_crossentropy(output, target):
+    return -(95.0 * target * tf.log(output) + 2.0 * (1.0 - target) * tf.log(1.0 - output)) / 100.0
+
+
+# Voxel-Wise Reconstruction Loss
+# Note that the output values are clipped to prevent the BCE from evaluating log(0).
+ae_outputs = tf.clip_by_value(ae_outputs, 1e-8, 1.0 - 1e-8)
+bce_loss = tf.dtypes.cast(tf.reduce_sum(weighted_binary_crossentropy(ae_outputs, ae_inputs), 1), dtype=tf.float32)
+bce_loss = tf.reduce_mean(bce_loss)
+# KL Divergence from isotropic gaussian prior
+kl_div = tf.reduce_mean(-0.5 * tf.reduce_sum(1.0 + 2.0 * z_std - tf.square(z_mean) - tf.exp(2.0 * z_std), 1))
+
+loss = kl_div + bce_loss
+#kl_div = tf.reduce_mean(kl_div)
+#generation_loss = tf.losses.mean_squared_error(ae_inputs, ae_outputs)
+#latent_loss = -0.5 * tf.reduce_sum(1.0 + 2.0 * z_std - tf.square(z_mean) - tf.exp(2.0 * z_std), 1)
+
+#loss = voxel_loss + kl_div
+#loss = tf.reduce_mean(generation_loss + latent_loss)
+optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
+
+"""
+Most codes from https://github.com/hwalsuklee/tensorflow-generative-model-collections/blob/master/VAE.py
+"""
+# loss
+'''ae_outputs = tf.clip_by_value(ae_outputs, 1e-8, 1 - 1e-8)
+marginal_likelihood = tf.reduce_sum(ae_inputs * tf.log(ae_outputs) + (1 - ae_inputs) * tf.log(1 - ae_outputs), [1, 2])
+KL_divergence = 0.5 * tf.reduce_sum(tf.square(z_mean) + tf.square(z_std) - tf.log(1e-8 + tf.square(z_std)) - 1, [1])
+
+neg_loglikelihood = -tf.reduce_mean(marginal_likelihood)
+KL_divergence = tf.reduce_mean(KL_divergence)
+
+ELBO = -neg_loglikelihood - KL_divergence
+
+loss = -ELBO
+optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)'''
+
+# ----------------- calculate the loss and optimize the simple auto encoder network -----------------------------
+
+#loss = tf.losses.mean_squared_error(ae_inputs, ae_outputs)  # calculate the mean square error loss
+#optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
 # -----------------------initialize the network---------------------------------
 init = tf.global_variables_initializer()
@@ -110,15 +165,16 @@ init = tf.global_variables_initializer()
 with tf.Session() as sess:
     sess.run(init)
     saver = tf.train.Saver()
-    plot_loss = np.zeros([1, 2])
+    plot_loss = np.zeros([1, 4])
+
     for ep in range(epoch_num):  # epochs loop
         next_batch_array = input_file  # copy of input file to use for fetching next batch from input array
         for batch_n in range(batch_per_ep):  # batches loop
             batch_img = next_batch(next_batch_array, batch_size, batch_n)  # read a batch
             batch_img = resize_batch(batch_img)  # reshape the images to (32, 32, 32)
-            _, c = sess.run([train_op, loss], feed_dict={ae_inputs: batch_img})
+            _, c, v_loss, k_loss = sess.run([optimizer, loss, bce_loss, kl_div], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
-            plot_loss = np.append(plot_loss, [[(ep+1), c]], axis=0)
+            plot_loss = np.append(plot_loss, [[(ep+1), c, v_loss, k_loss]], axis=0)
 
     save_path = saver.save(sess, '/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt')
     print("the model checkpoints save path is %s" % save_path)
@@ -126,19 +182,25 @@ with tf.Session() as sess:
     values = sess.run(variables_names)
     file = open("variables_after_training.txt", "a+")
     for k, v in zip(variables_names, values):
-        file.write("Variables:{}, Shape:{}, Values:{}".format(k,(v.shape),v))
+        file.write("Variables:{}, Shape:{}, Values:{}".format(k, (v.shape), v))
 
     # --------------------plot loss -------------------------------------
 
-    plot_loss = plot_loss[1:, 0:] # to eliminate first row as it represents 0 epoch and 0 loss
+    plot_loss = plot_loss[1:, 0:]  # to eliminate first row as it represents 0 epoch and 0 loss
     plt.plot(plot_loss[:, 0], plot_loss[:, 1], c='blue')
-    plt.savefig('output_data/test_loss.png')
+    plt.savefig('output_data/train_loss.png')
+    plt.close()
+    plt.plot(plot_loss[:, 0], plot_loss[:, 2], c='blue')
+    plt.savefig('output_data/bce_train_loss.png')
+    plt.close()
+    plt.plot(plot_loss[:, 0], plot_loss[:, 3], c='blue')
+    plt.savefig('output_data/KL_train_loss.png')
     plt.close()
 
     # ------------------test the trained network for test shapes -------------------------------
-
+    plot_loss_test = np.zeros([1, 2])
     for i in range(1, (total_test_input + 1)):
-        temp = np.loadtxt('/home/gigl/Research/simple_autoencoder/test_data/TestImg' + str(i) + '.txt')
+        temp = np.loadtxt('/home/gigl/Research/simple_autoencoder/test_data/TestFile' + str(i) + '.txt')
         test_img = np.reshape(temp, (32, 32, 32)).astype(np.float32)
         ax_z, ax_x, ax_y = test_img.nonzero()
         input_fig = plt.figure()
@@ -149,12 +211,18 @@ with tf.Session() as sess:
         test_img = np.reshape(test_img, (1, 32 * 32 * 32)).astype(np.float32)
 
         batch_img = resize_batch(test_img)
-        recon_img = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: batch_img})[1]
+        _, recon_img, c = sess.run([l_space, ae_outputs, loss], feed_dict={ae_inputs: batch_img})
         out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
+        print('test shape: {} - cost= {:.5f}'.format(i, c))
+        plot_loss_test = np.append(plot_loss_test, [[i, c]], axis=0)
 
         # -------------------------- plot the reconstructed images -------------------------
         for_plot.plot_output(out, OUTPUT_SIZE, i)
 
+    plot_loss_test = plot_loss_test[1:, 0:]  # to eliminate first row as it represents 0 epoch and 0 loss
+    plt.plot(plot_loss_test[:, 0], plot_loss_test[:, 1], c='blue')
+    plt.savefig('output_data/test_loss.png')
+    plt.close()
     # ------------------- Linear Interpolation --------------------------------
 
     train_shape_1 = resize_batch(input_file[0, :])
@@ -164,12 +232,11 @@ with tf.Session() as sess:
     for_plot.plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
-    print("This is the output of decoder before interpolation", train_l_space1)
+    print("This is the output shape of decoder before interpolation", train_output_image1)
 
-    #new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
-    print("This is the shape before interpolation", train_output_image1)
-    #interpolation_time = timer() - start
-    #print("Interpolation took %f seconds:", interpolation_time)
+    new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
+    #print("This is the shape before interpolation", train_output_image1)
+    interpolation_time = timer() - start
+    print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)
     #meshlab_visualize.meshlab_output()
-
