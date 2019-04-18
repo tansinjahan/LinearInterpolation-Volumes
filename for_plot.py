@@ -9,7 +9,7 @@ def plot_output(out_array, OUTPUT_SIZE, filename):
     for x_i in range(0, OUTPUT_SIZE):
         for y_j in range(0, OUTPUT_SIZE):
             for z_k in range(0, OUTPUT_SIZE):
-                if out_array[x_i, y_j, z_k] > 0.5:
+                if out_array[x_i, y_j, z_k] > 0.8:
                     plotOutArr = np.append(plotOutArr, 1)
                 else:
                     plotOutArr = np.append(plotOutArr, 0)

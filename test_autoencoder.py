@@ -22,7 +22,6 @@ total_train_input = 400 # total input volume
 total_test_input = 20 # input for testing the network [10 volumes]
 step_for_saving_graph = 50
 
-
 def interpolationBetnLatentSpace(z1, z2, save_path):
     # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
     maximum = 1
@@ -118,12 +117,12 @@ ae_outputs = md.decoder(l_space)
 # Weighted binary cross-entropy for use in voxel loss. Allows weighting of false positives relative to false negatives.
 # Nominally set to strongly penalize false negatives
 def weighted_binary_crossentropy(output, target):
-    return -(95.0 * target * tf.log(output) + 2.0 * (1.0 - target) * tf.log(1.0 - output)) / 100.0
+    return -(80.0 * target * tf.log(output) + 20 * (1.0 - target) * tf.log(1.0 - output)) / 100.0
 
 
 # Voxel-Wise Reconstruction Loss
 # Note that the output values are clipped to prevent the BCE from evaluating log(0).
-ae_outputs = tf.clip_by_value(ae_outputs, 1e-8, 1.0 - 1e-8)
+ae_outputs = tf.clip_by_value(ae_outputs, 1e-5, 1.0 - 1e-5)
 bce_loss = tf.dtypes.cast(tf.reduce_sum(weighted_binary_crossentropy(ae_outputs, ae_inputs), 1), dtype=tf.float32)
 bce_loss = tf.reduce_mean(bce_loss)
 # KL Divergence from isotropic gaussian prior

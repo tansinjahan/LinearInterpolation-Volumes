@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.axes
 from skimage import transform
 
-z_dims = 100
+z_dims = 20
 
 
 def encoder(inputs):
@@ -23,16 +23,15 @@ def encoder(inputs):
     net = lays.batch_norm(lays.flatten(net),decay=0.9)
 
     z_mean = lays.fully_connected(net, z_dims)
-    z_stdev = 0.5 * lays.fully_connected(net, z_dims)
+    z_stdev = 0.5 * tf.nn.softplus(lays.fully_connected(net, z_dims))
 
     # Reparameterization trick for Variational Autoencoder
-
-    samples = tf.random_normal([tf.shape(net)[0], z_dims], mean=0, stddev=1, dtype=tf.float32)
+    samples = tf.random_normal([tf.shape(z_mean)[0], z_dims], mean=0, stddev=1, dtype=tf.float32)
     print("rank and shape of samples", tf.rank(samples))
     guessed_z = z_mean + tf.multiply(samples, tf.exp(z_stdev))
     print("rank and shape of guessed z", tf.rank(guessed_z))
-    latent_space = guessed_z
-    return z_mean, z_stdev, latent_space
+    l_space = guessed_z
+    return z_mean, z_stdev, l_space
 
 
 def decoder(inputs):
