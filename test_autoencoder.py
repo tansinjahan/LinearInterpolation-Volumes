@@ -7,14 +7,14 @@ from skimage import transform
 from timeit import default_timer as timer
 from mpl_toolkits.mplot3d import Axes3D
 import meshlab_visualize
-import model2 as md
+import model as md
 import for_plot
 
 #import theano.tensor as T
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 50  # Number of epochs to train the network
+epoch_num = 10  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -46,7 +46,7 @@ def interpolationBetnLatentSpace(z1, z2, save_path):
         out = np.reshape(train_interpol_output, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         for_plot.plot_output(out, OUTPUT_SIZE, t)
         if (t == 0):
-            print("this is the output shape of decoder after interpolation", out)
+            print("this is the output shape of decoder after interpolation", out[1])
 
     return new_z
 
@@ -88,9 +88,17 @@ def next_batch(next_batch_array, batchsize, offset):
     rowEnd = (rowStart + batchsize)
     return next_batch_array[rowStart:rowEnd, :]
 
+# -------- loss functions from Generative and Discriminative VOXEL modeling paper ------
+
+def weighted_binary_crossentropy(output, target):
+    return -(80.0 * target * tf.log(output) + 20 * (1.0 - target) * tf.log(1.0 - output)) / 100.0
+
 
 # --------------------read data set----------------------
 input_file = loadfile()  # load 400 chairs as volume with shape [400,32768]
+print("input file shape:", input_file.shape, input_file[0])
+tmp = np.reshape(input_file[0], (32,32,32))
+for_plot.plot_output(tmp,OUTPUT_SIZE,"inputObjCheck")
 
 # ----------------- calculate the number of batches per epoch --------------------
 batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total= 400 divided by batch-size = 10 ]
@@ -98,66 +106,42 @@ batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [
 ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1), name="encoder_input")  # input to the network (shape volumes)
 
 # ---------for variational auto encoder(this has to be commented when simple auto encoder model is used) --------------
-z_mean, z_std, l_space = md.encoder(ae_inputs)
+#z_mean, z_std, l_space = md.encoder(ae_inputs)
 
 # ---------for simple auto encoder(this has to be commented when variational model is used) --------------
-#l_space = md.encoder(ae_inputs)
+l_space = md.encoder(ae_inputs)
 
 # --------- Output from decoder ---------------------
 ae_outputs = md.decoder(l_space)
 
-
-# ----------------- calculate the loss and optimize the variational auto encoder network ------------------------
+# ----------------- calculate the loss and optimize variational auto encoder network ------------------------
 
 #generation_loss = -tf.reduce_sum(ae_inputs * tf.log(1e-8 + ae_outputs) + (1-ae_inputs) * tf.log(1e-8 + 1 - ae_outputs), 1)
 
 #latent_loss = 0.5 * tf.reduce_sum(tf.square(z_mean) + tf.square(z_std) - tf.log(tf.square(z_std)) - 1,1)
 
-# -------- loss functions from Generative and Discriminative VOXEL modeling paper ------
-# Weighted binary cross-entropy for use in voxel loss. Allows weighting of false positives relative to false negatives.
-# Nominally set to strongly penalize false negatives
-def weighted_binary_crossentropy(output, target):
-    return -(80.0 * target * tf.log(output) + 20 * (1.0 - target) * tf.log(1.0 - output)) / 100.0
 
 
 # Voxel-Wise Reconstruction Loss
 # Note that the output values are clipped to prevent the BCE from evaluating log(0).
-ae_outputs = tf.clip_by_value(ae_outputs, 1e-5, 1.0 - 1e-5)
-bce_loss = tf.dtypes.cast(tf.reduce_sum(weighted_binary_crossentropy(ae_outputs, ae_inputs), 1), dtype=tf.float32)
+'''ae_outputs = tf.clip_by_value(ae_outputs, 1e-8, 1 - 1e-8)
+bce_loss = tf.reduce_sum(weighted_binary_crossentropy(ae_outputs, ae_inputs), [1,2])
 bce_loss = tf.reduce_mean(bce_loss)
 # KL Divergence from isotropic gaussian prior
-kl_div = tf.reduce_mean(-0.5 * tf.reduce_sum(1.0 + 2.0 * z_std - tf.square(z_mean) - tf.exp(2.0 * z_std), 1))
+kl_div = 0.5 * tf.reduce_sum(tf.square(z_mean) + tf.square(z_std) - tf.log(1e-8 + tf.square(z_std)) - 1, [1])
+kl_div = tf.reduce_mean(kl_div)
 
 loss = kl_div + bce_loss
-#kl_div = tf.reduce_mean(kl_div)
-#generation_loss = tf.losses.mean_squared_error(ae_inputs, ae_outputs)
-#latent_loss = -0.5 * tf.reduce_sum(1.0 + 2.0 * z_std - tf.square(z_mean) - tf.exp(2.0 * z_std), 1)
 
-#loss = voxel_loss + kl_div
-#loss = tf.reduce_mean(generation_loss + latent_loss)
-optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
-
-"""
-Most codes from https://github.com/hwalsuklee/tensorflow-generative-model-collections/blob/master/VAE.py
-"""
-# loss
-'''ae_outputs = tf.clip_by_value(ae_outputs, 1e-8, 1 - 1e-8)
-marginal_likelihood = tf.reduce_sum(ae_inputs * tf.log(ae_outputs) + (1 - ae_inputs) * tf.log(1 - ae_outputs), [1, 2])
-KL_divergence = 0.5 * tf.reduce_sum(tf.square(z_mean) + tf.square(z_std) - tf.log(1e-8 + tf.square(z_std)) - 1, [1])
-
-neg_loglikelihood = -tf.reduce_mean(marginal_likelihood)
-KL_divergence = tf.reduce_mean(KL_divergence)
-
-ELBO = -neg_loglikelihood - KL_divergence
-
-loss = -ELBO
 optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)'''
+
 
 # ----------------- calculate the loss and optimize the simple auto encoder network -----------------------------
 
-#loss = tf.losses.mean_squared_error(ae_inputs, ae_outputs)  # calculate the mean square error loss
-#optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
-
+loss = tf.losses.mean_squared_error(ae_inputs, ae_outputs)  # calculate the mean square error loss
+optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
+bce_loss = tf.constant([1.0])
+kl_div = tf.constant([1.0])
 # -----------------------initialize the network---------------------------------
 init = tf.global_variables_initializer()
 
@@ -187,7 +171,7 @@ with tf.Session() as sess:
 
     plot_loss = plot_loss[1:, 0:]  # to eliminate first row as it represents 0 epoch and 0 loss
     plt.plot(plot_loss[:, 0], plot_loss[:, 1], c='blue')
-    plt.savefig('output_data/train_loss.png')
+    plt.savefig('output_data/total_loss.png')
     plt.close()
     plt.plot(plot_loss[:, 0], plot_loss[:, 2], c='blue')
     plt.savefig('output_data/bce_train_loss.png')
@@ -231,10 +215,10 @@ with tf.Session() as sess:
     for_plot.plot_output(train_output_image1, OUTPUT_SIZE, 'trainimg')
     train_l_space2, train_output_image2 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_2})
     start = timer()
-    print("This is the output shape of decoder before interpolation", train_output_image1)
+    #print("This is the output shape of decoder before interpolation", train_output_image1)
 
     new_z = interpolationBetnLatentSpace(train_l_space1, train_l_space2, save_path)
-    #print("This is the shape before interpolation", train_output_image1)
+    print("This is the shape before interpolation", train_output_image1[1])
     interpolation_time = timer() - start
     print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)

@@ -28,7 +28,7 @@ def encoder(inputs):
     # Reparameterization trick for Variational Autoencoder
     samples = tf.random_normal([tf.shape(z_mean)[0], z_dims], mean=0, stddev=1, dtype=tf.float32)
     print("rank and shape of samples", tf.rank(samples))
-    guessed_z = z_mean + tf.multiply(samples, tf.exp(z_stdev))
+    guessed_z = z_mean + tf.multiply(samples, z_stdev)
     print("rank and shape of guessed z", tf.rank(guessed_z))
     l_space = guessed_z
     return z_mean, z_stdev, l_space
