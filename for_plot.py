@@ -6,24 +6,25 @@ from skimage import measure
 
 def plot_output(out_array, OUTPUT_SIZE, filename):
     plotOutArr = np.array([])
-    with_border_arr = np.array([])
+    with_border_arr = np.zeros([34, 34, 34])
     for x_i in range(0, OUTPUT_SIZE):
         for y_j in range(0, OUTPUT_SIZE):
             for z_k in range(0, OUTPUT_SIZE):
-                if out_array[x_i, y_j, z_k] > 0.6:
+                if out_array[x_i, y_j, z_k] > 0.7:
                     plotOutArr = np.append(plotOutArr, 1)
                 else:
                     plotOutArr = np.append(plotOutArr, 0)
 
-    '''for x_i in range(1, OUTPUT_SIZE+1):
-        for y_j in range(1, OUTPUT_SIZE+1):
-            for z_k in range(1, OUTPUT_SIZE+1):
-                 with_border_arr[x_i, y_j, z_k] = plotOutArr[x_i -1, y_j -1, z_k -1]'''
-
     output_image = np.reshape(plotOutArr, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
 
+    for x_i in range(0, OUTPUT_SIZE):
+        for y_j in range(0, OUTPUT_SIZE):
+            for z_k in range(0, OUTPUT_SIZE):
+                with_border_arr[x_i + 1, y_j + 1, z_k + 1] = output_image[x_i, y_j, z_k]
+
+    print(with_border_arr.shape)
     # Use marching cubes to obtain the surface mesh of these volumes
-    verts, faces, normals, values = measure.marching_cubes_lewiner(output_image, level=0.0, gradient_direction='descent')
+    verts, faces, normals, values = measure.marching_cubes_lewiner(with_border_arr, level=0.0, gradient_direction='descent')
 
     faces = faces + 1
     for_save = open('output_data/test_volume' + str(filename) + '.obj', 'w')

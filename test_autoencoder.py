@@ -14,7 +14,7 @@ import for_plot
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 10  # Number of epochs to train the network
+epoch_num = 5  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
@@ -33,7 +33,7 @@ def interpolationBetnLatentSpace(z1, z2, save_path):
         new_z1 = np.multiply(z1, (1-t))
         new_z2 = np.multiply(z2, t)
         new_z = np.add(new_z1, new_z2)
-        #print("new z shape before decoder", new_z.shape, type(new_z))
+        print("interpolation save path", save_path)
         saver = tf.train.import_meta_graph(save_path + '.meta')
         saver.restore(sess, save_path)
         variables_names = [s.name for s in tf.trainable_variables()]
@@ -98,7 +98,7 @@ def weighted_binary_crossentropy(output, target):
 input_file = loadfile()  # load 400 chairs as volume with shape [400,32768]
 print("input file shape:", input_file.shape, input_file[0])
 tmp = np.reshape(input_file[0], (32,32,32))
-for_plot.plot_output(tmp,OUTPUT_SIZE,"inputObjCheck")
+for_plot.plot_output(tmp, OUTPUT_SIZE, "inputObjCheck")
 
 # ----------------- calculate the number of batches per epoch --------------------
 batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 10 [input total= 400 divided by batch-size = 10 ]
@@ -222,4 +222,4 @@ with tf.Session() as sess:
     interpolation_time = timer() - start
     print("Interpolation took %f seconds:", interpolation_time)
     print("This is the shape of train_l_space1", train_l_space1.shape)
-    #meshlab_visualize.meshlab_output()
+    meshlab_visualize.meshlab_output()

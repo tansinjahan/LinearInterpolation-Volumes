@@ -11,4 +11,4 @@ variables_after_training.txt
 checkpoints/
 output_data/
 practice.py
-
+.idea/

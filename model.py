@@ -17,7 +17,7 @@ def encoder(inputs):
     net = lays.conv3d(net, 16, [4, 4, 4], stride=2, padding='SAME', trainable=True) #[8,8,8,16]
     net = lays.batch_norm(net, decay=0.999)
     net = lays.conv3d(net, 8, [4, 4, 4], stride=2, padding='SAME', trainable=True) #[4,4,4,8]
-
+    net = lays.batch_norm(net, decay=0.999)
     #net = lays.fully_connected(net, 100) # fc = [100]
 
     #net = lays.flatten(net,100)
