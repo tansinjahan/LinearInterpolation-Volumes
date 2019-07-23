@@ -12,3 +12,5 @@ checkpoints/
 output_data/
 practice.py
 .idea/
+Z_for_trainingShapes.txt
+simp_auto_venv/
