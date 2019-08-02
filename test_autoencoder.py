@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import transform
+import pandas as pd
 from timeit import default_timer as timer
 from mpl_toolkits.mplot3d import Axes3D
 import meshlab_visualize
@@ -27,7 +28,7 @@ INPUT_SIZE = 32 # size of the input volume given to the encoder
 total_train_input = 400 # total input volume
 total_test_input = 20 # input for testing the network [10 volumes]
 step_for_saving_graph = 50
-
+dim_of_z = 64
 
 def interpolationBetnLatentSpace(z1, z2, save_path):
     # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
@@ -89,7 +90,7 @@ def loadfile():
         input_fig = plt.figure()
         ax = input_fig.add_subplot(111, projection='3d')
         ax.scatter(ax_x, ax_y, ax_z, zdir='z', c='red')
-        plt.savefig('input_data/demo' + str(i) + '.png')
+        plt.savefig('input_data_train/demo' + str(i) + '.png')
         plt.close()
         input_file = np.append(input_file, image_matrix)
         
@@ -128,7 +129,7 @@ ae_inputs = tf.placeholder(tf.float32, (None, 32, 32, 32, 1), name="encoder_inpu
 #z_mean, z_std, l_space = md.encoder(ae_inputs)
 
 # ---------for simple auto encoder(this has to be commented when variational model is used) --------------
-l_space = md.encoder(ae_inputs)
+l_space = md.encoder(ae_inputs,dim_of_z)
 
 # --------- Output from decoder ---------------------
 ae_outputs = md.decoder(l_space)
@@ -165,7 +166,7 @@ kl_div = tf.constant([1.0])
 init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
-    file = open("Z_for_trainingShapes.txt", "w+")
+
     sess.run(init)
     saver = tf.train.Saver()
     plot_loss = np.zeros([1, 4])
@@ -177,15 +178,10 @@ with tf.Session() as sess:
 
             batch_img = resize_batch(batch_img)  # reshape the images to (32, 32, 32)
 
-            _, z_vec_to_save, c, v_loss, k_loss = sess.run([optimizer, l_space, loss, bce_loss, kl_div], feed_dict={ae_inputs: batch_img})
-            for i in range (0, z_vec_to_save.shape[0]):
-                #file.write("for batch:{}, Z_vector:{} with shape:{}".format(batch_img.shape, z_vec_to_save, z_vec_to_save.shape))
-                file.write("for image:{} of batch:{} Z_vector:{} with shape:{} \n".format(i,batch_img.shape, z_vec_to_save[i:, :], z_vec_to_save.shape))
-                break
+            _, z_vec, c, v_loss, k_loss = sess.run([optimizer, l_space, loss, bce_loss, kl_div], feed_dict={ae_inputs: batch_img})
             print('Epoch: {} - cost= {:.5f}'.format((ep + 1), c))
             plot_loss = np.append(plot_loss, [[(ep+1), c, v_loss, k_loss]], axis=0)
 
-    file.close()
     if not os.path.exists('checkpoints'):
         os.mkdir('checkpoints')
     save_path = saver.save(sess, ROOT_DIR + '/simple_autoencoder/checkpoints/model.ckpt')
@@ -211,19 +207,24 @@ with tf.Session() as sess:
 
     # ------------------test the trained network for test shapes -------------------------------
     plot_loss_test = np.zeros([1, 2])
+    arr = np.zeros([1, dim_of_z])
+    file = open("Z_for_trainingShapes.txt", "w+")
     for i in range(1, (total_test_input + 1)):
-        temp = np.loadtxt(ROOT_DIR + '/simple_autoencoder/train_data' + str(i) + '.txt')
+        temp = np.loadtxt(ROOT_DIR + '/simple_autoencoder/test_data/MyTestFile' + str(i) + '.txt')
         test_img = np.reshape(temp, (32, 32, 32)).astype(np.float32)
         ax_z, ax_x, ax_y = test_img.nonzero()
         input_fig = plt.figure()
         ax = input_fig.add_subplot(111, projection='3d')
         ax.scatter(ax_x, ax_y, ax_z, zdir='z', c='red')
-        plt.savefig('test_input_data/demo' + str(i) + '.png')
+        plt.savefig('input_data_test/demo' + str(i) + '.png')
         plt.close()
         test_img = np.reshape(test_img, (1, 32 * 32 * 32)).astype(np.float32)
 
         batch_img = resize_batch(test_img)
-        _, recon_img, c = sess.run([l_space, ae_outputs, loss], feed_dict={ae_inputs: batch_img})
+        z_vec, recon_img, c = sess.run([l_space, ae_outputs, loss], feed_dict={ae_inputs: batch_img})
+        for j in range(0, z_vec.shape[0]):
+            file.write("for image:{} \n batch, shape, z_vector:{}{}\n{} \n".format(j, batch_img.shape, z_vec.shape, z_vec[j:, :]))
+        arr = np.append(arr, z_vec, axis=0)
         out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         print('test shape: {} - cost= {:.5f}'.format(i, c))
         plot_loss_test = np.append(plot_loss_test, [[i, c]], axis=0)
@@ -231,13 +232,25 @@ with tf.Session() as sess:
         # -------------------------- plot the reconstructed images -------------------------
         for_plot.plot_output(out, OUTPUT_SIZE, i)
 
+    arr = arr[1:, :]
+    print("this is arr", arr, arr.shape)
+    for i in range(1, (arr.shape[1] + 1)):
+        arr_to_col = np.column_stack(arr[:, :i])
+    print(arr_to_col)
+
+    dataset_z = pd.DataFrame(arr_to_col)
+    #dataset_z.to_csv('dataset.csv')
+    dataset_z.to_excel('z_vector.xlsx')
+    print("dataset_z info", dataset_z.shape, dataset_z.head())
     plot_loss_test = plot_loss_test[1:, 0:]  # to eliminate first row as it represents 0 epoch and 0 loss
     plt.plot(plot_loss_test[:, 0], plot_loss_test[:, 1], c='blue')
     plt.savefig('output_data/test_loss.png')
     plt.close()
+
+
     # ------------------- Linear Interpolation --------------------------------
 
-    train_shape_1 = resize_batch(input_file[0, :])
+    '''train_shape_1 = resize_batch(input_file[0, :])
     train_shape_2 = resize_batch(input_file[1, :])
     train_l_space1, train_output_image1 = sess.run([l_space, ae_outputs], feed_dict={ae_inputs: train_shape_1})
     print("lspace shape", train_l_space1.shape, train_output_image1.shape)
@@ -254,4 +267,4 @@ with tf.Session() as sess:
     interpolation_time = timer() - start
     #print("Interpolation took %f seconds:", interpolation_time)
     #print("This is the shape of train_l_space1", train_l_space1.shape)
-    meshlab_visualize.meshlab_output()
+    meshlab_visualize.meshlab_output()'''

@@ -1,2 +1,2 @@
-model_checkpoint_path: "/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt"
-all_model_checkpoint_paths: "/home/gigl/Research/simple_autoencoder/checkpoints/model.ckpt"
+model_checkpoint_path: "/home/gigl/Documents/tansin/research/simple_autoencoder/checkpoints/model.ckpt"
+all_model_checkpoint_paths: "/home/gigl/Documents/tansin/research/simple_autoencoder/checkpoints/model.ckpt"

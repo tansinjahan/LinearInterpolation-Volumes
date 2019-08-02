@@ -14,3 +14,7 @@ practice.py
 .idea/
 Z_for_trainingShapes.txt
 simp_auto_venv/
+*.xlsx
+=
+test_autoencoder.py___jb_tmp___
+src/

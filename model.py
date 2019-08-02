@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.axes
 from skimage import transform
 
-def encoder(inputs):
+def encoder(inputs, z_dim):
     # encoder ()
     # 10 x 32 x 32 x 32 x 1   -> 10 x 16 x 16 x 16 x 32
     # 10 x 16 x 16 x 16 x 32  ->  10 x 8 x 8 x 8 x 16
@@ -21,7 +21,7 @@ def encoder(inputs):
     net = lays.batch_norm(net, decay=0.999)
 
     net = lays.flatten(net)
-    net = tf.layers.dense(net, units= 128, activation=tf.nn.relu)
+    net = tf.layers.dense(net, units= z_dim, activation=tf.nn.relu)
 
     #net = tf.layers.dense(net, 4, activation=tf.nn.relu)
     #net = tf.reshape(net, [512])
