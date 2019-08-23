@@ -8,6 +8,7 @@ import pandas as pd
 from timeit import default_timer as timer
 from mpl_toolkits.mplot3d import Axes3D
 import meshlab_visualize
+import calculateError
 import model as md
 import for_plot
 import os
@@ -21,14 +22,14 @@ print("root:", ROOT_DIR)
 
 # --------------- Define parameters -----------------------------
 batch_size = 10  # Number of samples in each batch
-epoch_num = 3  # Number of epochs to train the network
+epoch_num = 50  # Number of epochs to train the network
 lr = 0.001  # Learning rate
 OUTPUT_SIZE = 32 # size of the output volume produced by decoder
 INPUT_SIZE = 32 # size of the input volume given to the encoder
 total_train_input = 400 # total input volume
-total_test_input = 20 # input for testing the network [10 volumes]
+total_test_input = 400 # input for testing the network [10 volumes]
 step_for_saving_graph = 50
-dim_of_z = 64
+dim_of_z = 128
 
 def interpolationBetnLatentSpace(z1, z2, save_path):
     # -----------interpolation with formula [new_z = (1 - t) * z1 + t * z2] --------------------------
@@ -93,7 +94,6 @@ def loadfile():
         plt.savefig('input_data_train/demo' + str(i) + '.png')
         plt.close()
         input_file = np.append(input_file, image_matrix)
-        
 
     input_file = np.reshape(input_file, (total_train_input, 32 * 32 * 32)).astype(np.float32)
     return input_file
@@ -117,8 +117,11 @@ def weighted_binary_crossentropy(output, target):
 
 # --------------------read data set----------------------
 input_file = loadfile()  # load 400 chairs as volume with shape [400,32768]
-
-
+# ---------To check input shapes as .OBJ -------------
+test = input_file[14, :]
+print("test shape", test.shape)
+test = np.reshape(test, (32, 32, 32)).astype(np.float32)
+for_plot.plot_output(test, OUTPUT_SIZE, 'inputCheck')
 # ----------------- calculate the number of batches per epoch --------------------
 batch_per_ep = input_file.shape[0] // batch_size  # batch per epoch will be 40 [input total= 400 / 10 ]
 
@@ -208,9 +211,10 @@ with tf.Session() as sess:
     # ------------------test the trained network for test shapes -------------------------------
     plot_loss_test = np.zeros([1, 2])
     arr = np.zeros([1, dim_of_z])
+    output_file = np.array([])
     file = open("Z_for_trainingShapes.txt", "w+")
     for i in range(1, (total_test_input + 1)):
-        temp = np.loadtxt(ROOT_DIR + '/simple_autoencoder/test_data/MyTestFile' + str(i) + '.txt')
+        temp = np.loadtxt(ROOT_DIR + '/simple_autoencoder/train_data/MyTestFile' + str(i) + '.txt')
         test_img = np.reshape(temp, (32, 32, 32)).astype(np.float32)
         ax_z, ax_x, ax_y = test_img.nonzero()
         input_fig = plt.figure()
@@ -228,10 +232,13 @@ with tf.Session() as sess:
         out = np.reshape(recon_img, (OUTPUT_SIZE, OUTPUT_SIZE, OUTPUT_SIZE)).astype(np.float32)
         print('test shape: {} - cost= {:.5f}'.format(i, c))
         plot_loss_test = np.append(plot_loss_test, [[i, c]], axis=0)
-
+        output_file = np.append(output_file, out)
         # -------------------------- plot the reconstructed images -------------------------
         for_plot.plot_output(out, OUTPUT_SIZE, i)
 
+    output_file = np.reshape(output_file, (total_train_input, 32 * 32 * 32)).astype(np.float32)
+    print("input and output file shape", input_file.shape, output_file.shape)
+    calculateError.cal_all_error(input_file, output_file)
     arr = arr[1:, :]
     print("this is arr", arr, arr.shape)
     for i in range(1, (arr.shape[1] + 1)):

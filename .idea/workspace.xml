@@ -2,38 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9ea7ff75-280d-4115-bb20-cf4646c66e99" name="Default Changelist" comment="added screenshot">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/checkpoint" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MDN.py" beforeDir="false" afterPath="$PROJECT_DIR$/MDN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.data-00000-of-00001" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.index" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/model.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/model.ckpt.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/for_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/for_plot.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_loss.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_loss.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.0.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.1.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.2.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.30000000000000004.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.30000000000000004.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.4.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.5.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.6000000000000001.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.6000000000000001.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.7000000000000001.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.7000000000000001.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.8.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.9.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume0.9.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume1.0.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volume1.0.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume1.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume1.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume10.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume10.png" afterDir="false" />
@@ -54,19 +30,7 @@
       <change beforePath="$PROJECT_DIR$/output_data/test_volume8.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume8.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume9.png" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume9.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output_data/test_volume9.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output_data/test_volume9.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_data/test_volumetrainimg.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/test_autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_autoencoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo10.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo3.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo4.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo5.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo6.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo7.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo8.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_input_data/demo9.png" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -83,12 +47,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="67" />
-    <option name="y" value="27" />
-    <option name="width" value="1657" />
-    <option name="height" value="941" />
   </component>
   <component name="ProjectId" id="1OTC4Nj0fchurBk4SqdgKqXm7io" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -110,7 +68,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test_autoencoder">
+  <component name="RunManager" selected="Python.decoder_test">
     <configuration name="MDN" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="simple_autoencoder" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -132,7 +90,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="autoencoder_main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="calculateError" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="simple_autoencoder" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -144,7 +102,28 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/autoencoder_main.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/calculateError.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="decoder_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="simple_autoencoder" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/decoder_test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -195,41 +174,20 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="variational_autoencoder" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="simple_autoencoder" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/variational_autoencoder.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
-      <item itemvalue="Python.autoencoder_main" />
       <item itemvalue="Python.practice (1)" />
       <item itemvalue="Python.test_autoencoder" />
-      <item itemvalue="Python.variational_autoencoder" />
       <item itemvalue="Python.MDN" />
+      <item itemvalue="Python.calculateError" />
+      <item itemvalue="Python.decoder_test" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.decoder_test" />
         <item itemvalue="Python.test_autoencoder" />
+        <item itemvalue="Python.calculateError" />
         <item itemvalue="Python.practice (1)" />
         <item itemvalue="Python.MDN" />
-        <item itemvalue="Python.variational_autoencoder" />
-        <item itemvalue="Python.autoencoder_main" />
       </list>
     </recent_temporary>
   </component>

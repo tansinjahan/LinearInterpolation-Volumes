@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import measure
 
-def plot_output(out_array, OUTPUT_SIZE, filename):
+def plot_output(out_array: object, OUTPUT_SIZE: object, filename: object) -> object:
     plotOutArr = np.array([])
     with_border_arr = np.zeros([34, 34, 34])
     for x_i in range(0, OUTPUT_SIZE):

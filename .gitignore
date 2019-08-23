@@ -3,9 +3,10 @@ venv/
 Volume of shapes/
 input_data/
 __pycache__/
-test_data
-test_input_data
-train_data
+test_data/
+input_data_train/
+input_data_test/
+train_data/
 variables_after_restoring.txt
 variables_after_training.txt
 checkpoints/
@@ -18,3 +19,5 @@ simp_auto_venv/
 =
 test_autoencoder.py___jb_tmp___
 src/
+predictions_mu.csv
+predictions_sigma.csv

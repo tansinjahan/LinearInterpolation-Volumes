@@ -12,7 +12,7 @@ def encoder(inputs, z_dim):
     # 10 x 32 x 32 x 32 x 1   -> 10 x 16 x 16 x 16 x 32
     # 10 x 16 x 16 x 16 x 32  ->  10 x 8 x 8 x 8 x 16
     # 10 x 8 x 8 x 8 x 16    ->  10 x 4 x 4 x 4 x 8
-
+    # 10 x 4 x 4 x 4 x 8  -> z dim
     net = lays.conv3d(inputs, 32, [4, 4, 4], stride=2, padding='SAME', trainable=True) #[16,16,16,32]
     net = lays.batch_norm(net, decay=0.999)
     net = lays.conv3d(net, 16, [4, 4, 4], stride=2, padding='SAME', trainable=True) #[8,8,8,16]
